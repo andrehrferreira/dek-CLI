@@ -3,6 +3,7 @@
 import fs from "fs";
 import path from "path";
 
+import 'babel-polyfill';
 import minimist from "minimist";
 import chalk from "chalk";
 import clear from "clear";
@@ -11,7 +12,11 @@ import inquirer from "inquirer";
 import i18n from "i18n";
 import _ from "lodash";
 
+import Help from "./help";
 import Init from "./init";
+import Install from "./install";
+import New from "./new";
+import Update from "./update";
 
 const PackageJSON = require(path.join(process.cwd(), "package"));
 
@@ -26,40 +31,24 @@ i18n.configure({
 
 class CLI {
     constructor(argv) {
-        //clear();
-        //console.log(chalk.red(figlet.textSync('Dek', { horizontalLayout: 'full' })));
-
         switch(argv._[0]){
-            case "init": Init(); break;
+            case "init": Init(argv); break;
             case "new":
             case "n":
-                console.log("new");
+                switch(argv._[1]){
+                    case "plugin": New.Plugin(argv); break;
+                    case "controller": New.Controller(argv); break;
+                    default:
+                        console.log(chalk.red(i18n.__("Command not found, use 'dek help' for more information")));
+                    break;
+                }
             break;
-            case "install":
-            case "i":
-                console.log("install");
-            break;
-            case "update":
-            case "u":
-                console.log("update");
-            break;
-            case "help":
-            case "h":
-            case "?":
-                console.log("help");
-            break;
+            case "install": case "i": Install(argv); break;
+            case "update": case "u": Update(argv); break;
+            case "help": case "h": case "?": Help(); break;
             default:
-                console.log(chalk.red(i18n.__("Command not found")));
+                console.log(chalk.red(i18n.__("Command not found, use 'dek help' for more information")));
             break;
-        }
-    }
-
-    directoryExists(filePath){
-        try {
-            return fs.statSync(filePath).isDirectory();
-        }
-        catch (err) {
-            return false;
         }
     }
 }

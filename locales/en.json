@@ -7,5 +7,16 @@
 	"Please set a valid value": "Please set a valid value",
 	"What is the repository of this project?": "What is the repository of this project?",
 	"Select plugins for your project:": "Select plugins for your project:",
-	"Command not found": "Command not found"
+	"Command not found": "Command not found",
+	"Command not found, use 'dek help' for more information": "Command not found, use 'dek help' for more information",
+	"It was not possible to create the project because the directory already exists": "It was not possible to create the project because the directory already exists",
+	"Clone boorstrap... ": "Clone boorstrap... ",
+	"Creating directory... ": "Creating directory... ",
+	"Creating directory ": "Creating directory ",
+	"Clone boorstrap ": "Clone boorstrap ",
+	"Unlink .git and package.json": "Unlink .git and package.json",
+	"Unlink package.json": "Unlink package.json",
+	"Unlink /media/andre/DADOS/Projetos/Dek/CLI/myproject/.git": "Unlink /media/andre/DADOS/Projetos/Dek/CLI/myproject/.git",
+	"Creating package.json ...": "Creating package.json ...",
+	"Creating .git ...": "Creating .git ..."
 }

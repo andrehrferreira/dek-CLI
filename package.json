@@ -2,19 +2,30 @@
     "name": "@dek/cli",
     "version": "1.0.0",
     "description": "CLI for Dek",
-    "main": "src/index.js",
+    "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "babel src -s -D -d build --presets env"
+        "test": "npm run build && mocha",
+        "build": "babel src -s -D -d build --presets env",
+        "start": "npm run build && node build"
+    },
+    "bin": {
+        "dek": "build/index.js"
+    },
+    "engines": {
+        "node": ">= 6.0.0"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/dekproject/CLI.git"
+        "url": "https://github.com/dekproject/CLI.git"
     },
     "keywords": [
-        "CLI"
+        "CLI",
+        "Dek"
     ],
-    "author": "Andre Ferreira",
+    "author": "Andre Ferreira <andre@vigiadepreco.com.br>",
+    "contributors": [
+        "Eduardo Lima <eduardo@vigiadepreco.com.br>"
+    ],
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/dekproject/CLI/issues"
@@ -24,28 +35,32 @@
         "chalk": "^2.4.2",
         "clear": "^0.1.0",
         "figlet": "^1.2.1",
+        "git-clone": "^0.1.0",
         "i18n": "^0.8.3",
         "inquirer": "^6.2.2",
         "inquirer-fuzzy-path": "^2.0.1",
         "lodash": "^4.17.11",
-        "minimist": "^1.2.0"
+        "minimist": "^1.2.0",
+        "rimraf": "^2.6.3"
     },
     "devDependencies": {
         "babel-cli": "^6.26.0",
+        "babel-polyfill": "^6.26.0",
         "babel-preset-env": "^1.7.0",
         "babel-preset-minify": "^0.5.0",
+        "mocha": "^5.2.0",
         "nodemon": "^1.18.9"
     },
-    "dekPlugins": {
-        "Express": "https://github.com/dekproject/Express",
-        "MongoDB": "https://github.com/dekproject/MongoDB",
-        "Redis": "https://github.com/dekproject/Redis",
-        "Authentication": "https://github.com/dekproject/Authentication",
-        "Elasticsearch": "https://github.com/dekproject/Elasticsearch",
-        "TensorFlow": "https://github.com/dekproject/TensorFlow",
-        "SendGrid": "https://github.com/dekproject/SendGrid"
+    "@dek/plugins": {
+        "Express": "https://github.com/dekproject/express",
+        "MongoDB": "https://github.com/dekproject/mongodb",
+        "Redis": "https://github.com/dekproject/redis",
+        "Authentication": "https://github.com/dekproject/authentication",
+        "Elasticsearch": "https://github.com/dekproject/elasticsearch",
+        "TensorFlow": "https://github.com/dekproject/tensorflow",
+        "SendGrid": "https://github.com/dekproject/sendgrid"
     },
-    "bin": {
-        "dek": "build/index.js"
+    "@dek/scripts": {
+        "devMode": "npm i babel-cli babel-preset-env babel-preset-minify nodemon mocha --save-dev"
     }
 }

@@ -33,16 +33,18 @@ The CLI will ask you some questions for configuring the **package.json** and **.
 ? Select plugins for your project: Express, MongoDB
 ```
 
-### Install all plugins/dependencies
+### Install plugins/dependencies
 
 ```bash
-$ dek [install/i]
+$ dek [install/i] //Install all plugins
 ```
 
-### Install plugins
+```bash
+$ dek [install/i] Express MongoDB Authentication
+```
 
 ```bash
-$ dek [install/i] plugin [repository]
+$ dek [install/i] https://github.com/dekproject/redis
 ```
 
 ### Update dependencies
