@@ -1,0 +1,11 @@
+{
+	"myproject": "myproject",
+	"What is the name of the project?": "What is the name of the project?",
+	"Select a target directory for your project:": "Select a target directory for your project:",
+	"Directory for your project:": "Directory for your project:",
+	"What is the version of the project?": "What is the version of the project?",
+	"Please set a valid value": "Please set a valid value",
+	"What is the repository of this project?": "What is the repository of this project?",
+	"Select plugins for your project:": "Select plugins for your project:",
+	"Command not found": "Command not found"
+}
