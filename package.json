@@ -6,6 +6,7 @@
     "scripts": {
         "test": "npm run build && mocha",
         "build": "babel src -s -D -d build --presets env",
+        "testbin": "node build",
         "start": "npm run build && node build"
     },
     "bin": {
@@ -45,7 +46,6 @@
     },
     "devDependencies": {
         "babel-cli": "^6.26.0",
-        "babel-polyfill": "^6.26.0",
         "babel-preset-env": "^1.7.0",
         "babel-preset-minify": "^0.5.0",
         "mocha": "^5.2.0",
@@ -61,6 +61,9 @@
         "SendGrid": "https://github.com/dekproject/sendgrid"
     },
     "@dek/scripts": {
-        "devMode": "npm i babel-cli babel-preset-env babel-preset-minify nodemon mocha --save-dev"
+        "cliDevMode": "sudo npm i -g nodemon",
+        "devMode": "export NODE_PATH=../node_modules && npm i babel-cli babel-preset-env babel-preset-minify nodemon mocha --save-dev",
+        "webpack": "npm i --save-dev webpack webpack-cli webpack-dev-server html-webpack-plugin babel-core babel-loader babel-preset-es2015",
+        "react": "npm i react react-dom --save && npm i babel-preset-react --save-dev"
     }
 }

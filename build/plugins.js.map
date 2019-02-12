@@ -1,1 +1,1 @@
-{"version":3,"sources":[],"names":[],"mappings":"","file":"plugins.js","sourcesContent":[]}
+{"version":3,"sources":["../src/plugins.js"],"names":["Plugins","console","log"],"mappings":";;;;;;;;AAAA;;;;IAEqBA,O;;;;;;;yCACD;AACZC,oBAAQC,GAAR,CAAY,iBAAZ;AACH;;;;;;kBAHgBF,O","file":"plugins.js","sourcesContent":["import 'babel-polyfill';\n\nexport default class Plugins{\n    installPlugins(){\n        console.log(\"install plugins\");\n    }\n}\n"]}

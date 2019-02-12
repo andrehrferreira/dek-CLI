@@ -18,5 +18,11 @@
 	"Unlink package.json": "Unlink package.json",
 	"Unlink /media/andre/DADOS/Projetos/Dek/CLI/myproject/.git": "Unlink /media/andre/DADOS/Projetos/Dek/CLI/myproject/.git",
 	"Creating package.json ...": "Creating package.json ...",
-	"Creating .git ...": "Creating .git ..."
+	"Creating .git ...": "Creating .git ...",
+	"Unlink /media/andre/DADOS/Projetos/Dek/CLI/bootstrap/.git": "Unlink /media/andre/DADOS/Projetos/Dek/CLI/bootstrap/.git",
+	"Install dev mode ...": "Install dev mode ...",
+	"Unlink /media/andre/DADOS/Projetos/Dek/CLI/boostrap/.git": "Unlink /media/andre/DADOS/Projetos/Dek/CLI/boostrap/.git",
+	"Do you want to install Webpack to optimize your frontend?": "Do you want to install Webpack to optimize your frontend?",
+	"Do you want to install components for development mode?": "Do you want to install components for development mode?",
+	"Install Webpack ...": "Install Webpack ..."
 }

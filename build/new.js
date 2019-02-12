@@ -1,2 +1,75 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var _createClass=function(){function a(a,b){for(var c,d=0;d<b.length;d++)c=b[d],c.enumerable=c.enumerable||!1,c.configurable=!0,"value"in c&&(c.writable=!0),Object.defineProperty(a,c.key,c)}return function(b,c,d){return c&&a(b.prototype,c),d&&a(b,d),b}}(),_fs=require("fs"),_fs2=_interopRequireDefault(_fs),_path=require("path"),_path2=_interopRequireDefault(_path);require("babel-polyfill");var _minimist=require("minimist"),_minimist2=_interopRequireDefault(_minimist),_chalk=require("chalk"),_chalk2=_interopRequireDefault(_chalk),_inquirer=require("inquirer"),_inquirer2=_interopRequireDefault(_inquirer),_i18n=require("i18n"),_i18n2=_interopRequireDefault(_i18n),_lodash=require("lodash"),_lodash2=_interopRequireDefault(_lodash);function _interopRequireDefault(a){return a&&a.__esModule?a:{default:a}}function _classCallCheck(a,b){if(!(a instanceof b))throw new TypeError("Cannot call a class as a function")}var PackageJSON=require(_path2.default.join(process.cwd(),"package")),prompt=_inquirer2.default.createPromptModule();_inquirer2.default.registerPrompt("fuzzypath",require("inquirer-fuzzy-path")),_i18n2.default.configure({locales:["en","ptBR"],defaultLocale:"en",directory:_path2.default.join(process.cwd(),"locales")});var New=function(){function a(){_classCallCheck(this,a)}return _createClass(a,[{key:"Plugin",value:function a(){console.log("new plugin")}},{key:"Controller",value:function a(){console.log("new controller")}}]),a}();exports.default=new New;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _fs = require("fs");
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _path = require("path");
+
+var _path2 = _interopRequireDefault(_path);
+
+require("babel-polyfill");
+
+var _minimist = require("minimist");
+
+var _minimist2 = _interopRequireDefault(_minimist);
+
+var _chalk = require("chalk");
+
+var _chalk2 = _interopRequireDefault(_chalk);
+
+var _inquirer = require("inquirer");
+
+var _inquirer2 = _interopRequireDefault(_inquirer);
+
+var _i18n = require("i18n");
+
+var _i18n2 = _interopRequireDefault(_i18n);
+
+var _lodash = require("lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var PackageJSON = require(_path2.default.join(process.cwd(), "package"));
+
+var prompt = _inquirer2.default.createPromptModule();
+_inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
+
+_i18n2.default.configure({
+    locales: ['en', 'ptBR'],
+    defaultLocale: 'en',
+    directory: _path2.default.join(process.cwd(), "locales")
+});
+
+var New = function () {
+    function New() {
+        _classCallCheck(this, New);
+    }
+
+    _createClass(New, [{
+        key: "Plugin",
+        value: function Plugin() {
+            console.log("new plugin");
+        }
+    }, {
+        key: "Controller",
+        value: function Controller() {
+            console.log("new controller");
+        }
+    }]);
+
+    return New;
+}();
+
+exports.default = new New();
 //# sourceMappingURL=new.js.map

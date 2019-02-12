@@ -76,6 +76,14 @@ export class Init{
                 name: 'repository',
                 message: i18n.__("What is the repository of this project?"),
             }, {
+                type: 'confirm',
+                name: 'devmode',
+                message: i18n.__("Do you want to install components for development mode?"),
+            }, {
+                type: 'confirm',
+                name: 'webpack',
+                message: i18n.__("Do you want to install Webpack to optimize your frontend?"),
+            }, {
                 type: 'checkbox',
                 name: 'plugins',
                 message: i18n.__("Select plugins for your project:"),
@@ -91,111 +99,143 @@ export class Init{
     createProject(){
         var self = this;
 
-        new Promise((resolve, reject) => {
-            if(!this.directoryExists(self.settings.path)){
-                console.log(chalk.green(i18n.__("Creating directory ") + self.settings.path));
+        if(!this.directoryExists(self.settings.path)){
+            console.log(chalk.green(i18n.__("Creating directory ") + self.settings.path));
 
-                fs.mkdir(self.settings.path, { recursive: true }, (err) => {
-                    if(err) reject(err);
-                    else resolve(self);
-                });
-            }
-            else{
-                reject(i18n.__("It was not possible to create the project because the directory already exists"));
-            }
-        }).then(self.cloneSkeleton).catch(err => {
-            console.log(chalk.red(err));
-        });
+            fs.mkdir(self.settings.path, { recursive: true }, (err) => {
+                if(err) reject(err);
+                else self.cloneSkeleton(self);
+            });
+        }
+        else{
+            console.log(chalk.red((i18n.__("It was not possible to create the project because the directory already exists"))));
+        }
     }
 
     cloneSkeleton(self){
+        console.log(chalk.green(i18n.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
-        new Promise((resolve, reject) => {
-            console.log(chalk.green(i18n.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
-
-            gitClone(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, err => {
-                if(err) reject(chalk.red(err));
-                else resolve(self);
-            });
-        }).then(self.unlinkGitAndPackage).catch(err => {
-            console.log(chalk.red(err));
+        gitClone(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, err => {
+            if(err) reject(chalk.red(err));
+            else self.unlinkGitAndPackage(self);
         });
     }
 
     unlinkGitAndPackage(self){
-        new Promise((resolve, reject) => {
+        try{
+            console.log(chalk.green(i18n.__("Unlink package.json")));
+            fs.unlinkSync(path.join(self.settings.path, "package.json"));
+        } catch(e) { /*console.log(chalk.red(e.message));*/ }
 
-            try{
-                console.log(chalk.green(i18n.__("Unlink package.json")));
-                fs.unlinkSync(path.join(self.settings.path, "package.json"));
-            } catch(e) { console.log(chalk.red(e.message)); }
+        console.log(chalk.green(i18n.__("Unlink " + path.join(self.settings.path, ".git"))));
 
-            console.log(chalk.green(i18n.__("Unlink " + path.join(self.settings.path, ".git"))));
-
-            rimraf(path.join(self.settings.path, ".git"), () => {
-                resolve(self);
-            });
-        }).then(self.createGitAndPackage).catch(err => {
-            console.log(chalk.red(err));
+        rimraf(path.join(self.settings.path, ".git"), () => {
+            self.createGitAndPackage(self);
         });
     }
 
     createGitAndPackage(self){
         console.log(chalk.green(i18n.__("Creating package.json ...")));
 
-        let projectPackageJSON = {
-            name: self.settings.name,
-            version: self.settings.version,
-            description: "",
-            main: "src/index.js",
-            scripts: {
-                "test": "npm run build && mocha",
-                "dev": "nodemon -w src --exec \"babel-node src --presets env\"",
-                "build": "babel src -s -D -d build --presets env",
-                "start": "npm run build && node build"
-            },
-            devDependencies: {},
-            dependencies: {}
-        }
+        console.log(path.join(process.cwd(), "templates", "package.json.js"));
+        var packageJSONTemplate = require(path.join(process.cwd(), "templates", "package.json.js"));
+        console.log(packageJSONTemplate);
+        packageJSONTemplate = packageJSONTemplate(self);
 
-        if(self.settings.repository){
-            projectPackageJSON.homepage = self.settings.repository;
+        if(self.settings.repository != ""){
+            packageJSONTemplate.homepage = self.settings.repository;
 
-            projectPackageJSON.repository = {
+            packageJSONTemplate.repository = {
                 "type": "git",
                 "url": self.settings.repository
             };
 
-            projectPackageJSON.bugs = {
+            packageJSONTemplate.bugs = {
                 "url": self.settings.repository + "/issues"
             }
         }
 
-        fs.writeFileSync(path.join(self.settings.path, "package.json"), JSON.stringify(projectPackageJSON, null, 4));
+        console.log(packageJSONTemplate);
 
-        console.log(chalk.green(i18n.__("Creating .git ...")));
+        if(this.settings.webpack)
+            packageJSONTemplate.scripts.build += " && webpack --mode production --progress";
 
-        if(self.settings.repository){
-            exec("git init", { cwd: self.settings.path }, (err) => {
+        fs.writeFileSync(path.join(self.settings.path, "package.json"), JSON.stringify(packageJSONTemplate, null, 4));
+
+        if(self.settings.repository != ""){
+            console.log(chalk.green(i18n.__("Creating .git ...")));
+
+            exec("git init", { cwd: self.settings.path }, (err, stdout, stderr) => {
+                process.stdout.write(stdout + '\n');
+                process.stderr.write(stderr + '\n');
+
                 if(err) console.log(chalk.red(err));
+                else if(stderr) console.log(chalk.red(stderr));
                 else{
-                    exec("git remote add origin " + self.settings.repository, { cwd: self.settings.path }, (err) => {
+                    exec("git remote add origin " + self.settings.repository, { cwd: self.settings.path }, (err, stdout, stderr) => {
+                        process.stdout.write(stdout + '\n');
+                        process.stderr.write(stderr + '\n');
+
                         if(err) console.log(chalk.red(err));
+                        else if(stderr) console.log(chalk.red(stderr));
                         else{
-                            self.installDevMode(self);
+                            if(this.settings.devmode)
+                                self.installDevMode(self);
+                            else
+                                installPlugins(self.settings);
+
+                            if(this.settings.webpack)
+                                self.installWebpack(self);
                         }
                     });
                 }
             });
+        }
+        else{
+            if(this.settings.devmode)
+                self.installDevMode(self);
+            else
+                installPlugins(self.settings);
+
+            if(this.settings.webpack)
+                self.installWebpack(self);
         }
     }
 
     installDevMode(self){
         console.log(chalk.green(i18n.__("Install dev mode ...")));
 
-        exec(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, (err) => {
-            if(err) console.log(chalk.red(err));
-            else installPlugins(self.settings);
+        exec(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
+            process.stdout.write(stdout + '\n');
+            process.stderr.write(stderr + '\n');
+        });
+
+        try{
+            exec(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
+                process.stdout.write(stdout + '\n');
+                process.stderr.write(stderr + '\n');
+
+                if(err) console.log(chalk.red(err));
+                else if(stderr) console.log(chalk.red(stderr));
+                else {
+                    installPlugins(self.settings);
+                }
+            });
+        } catch(e){
+            console.log(chalk.red(e.message));
+            installPlugins(self.settings);
+        }
+    }
+
+    installWebpack(self){
+        console.log(chalk.green(i18n.__("Install Webpack ...")));
+
+        exec(PackageJSON["@dek/scripts"].webpack, { cwd: self.settings.path }, (err, stdout, stderr) => {
+            process.stdout.write(stdout + '\n');
+            process.stderr.write(stderr + '\n');
+
+            var WebpackConfigTemplate = require(path.join(process.cwd(), "templates", "webpack.config.js"))(self);
+            fs.writeFileSync(path.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate(self));
         });
     }
 
