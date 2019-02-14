@@ -24,5 +24,6 @@
 	"Unlink /media/andre/DADOS/Projetos/Dek/CLI/boostrap/.git": "Unlink /media/andre/DADOS/Projetos/Dek/CLI/boostrap/.git",
 	"Do you want to install Webpack to optimize your frontend?": "Do you want to install Webpack to optimize your frontend?",
 	"Do you want to install components for development mode?": "Do you want to install components for development mode?",
-	"Install Webpack ...": "Install Webpack ..."
+	"Install Webpack ...": "Install Webpack ...",
+	"Do you want to install some frontend framework?": "Do you want to install some frontend framework?"
 }

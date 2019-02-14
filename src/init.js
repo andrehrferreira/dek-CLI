@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import npm from "npm";
 
 import 'babel-polyfill';
 import minimist from "minimist";
@@ -88,6 +89,11 @@ export class Init{
                 name: 'plugins',
                 message: i18n.__("Select plugins for your project:"),
                 choices: Object.keys(PackageJSON["@dek/plugins"])
+            }, {
+                type: 'list',
+                name: 'frontend',
+                message: i18n.__("Do you want to install some frontend framework?"),
+                choices: ["None", "Angular 7", "React", "Vue.js"]
             }]).then(projectSettings2 => {
                 projectSettings = _.merge(projectSettings, projectSettings2);
                 this.settings = projectSettings;
@@ -202,38 +208,34 @@ export class Init{
         }
     }
 
+    addPackageDependencies(script, settings, callback){
+        var sepScript = script.split("&&");
+        console.log();
+    }
+
     installDevMode(self){
         console.log(chalk.green(i18n.__("Install dev mode ...")));
 
         exec(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
             process.stdout.write(stdout + '\n');
             process.stderr.write(stderr + '\n');
+
+            try{
+                self.addPackageDependencies(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, (err) => {
+                    if(err) console.log(chalk.red(err));
+                    else installPlugins(self.settings);
+                });
+            } catch(e){
+                console.log(chalk.red(e.message));
+                installPlugins(self.settings);
+            }
         });
-
-        try{
-            exec(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
-                process.stdout.write(stdout + '\n');
-                process.stderr.write(stderr + '\n');
-
-                if(err) console.log(chalk.red(err));
-                else if(stderr) console.log(chalk.red(stderr));
-                else {
-                    installPlugins(self.settings);
-                }
-            });
-        } catch(e){
-            console.log(chalk.red(e.message));
-            installPlugins(self.settings);
-        }
     }
 
     installWebpack(self){
         console.log(chalk.green(i18n.__("Install Webpack ...")));
 
-        exec(PackageJSON["@dek/scripts"].webpack, { cwd: self.settings.path }, (err, stdout, stderr) => {
-            process.stdout.write(stdout + '\n');
-            process.stderr.write(stderr + '\n');
-
+        self.addPackageDependencies(PackageJSON["@dek/scripts"].webpack, { cwd: self.settings.path }, (err) => {
             var WebpackConfigTemplate = require(path.join(process.cwd(), "templates", "webpack.config.js"))(self);
             fs.writeFileSync(path.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate(self));
         });

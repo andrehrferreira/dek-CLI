@@ -131,6 +131,11 @@ var Init = exports.Init = function () {
                     name: 'plugins',
                     message: _i18n2.default.__("Select plugins for your project:"),
                     choices: Object.keys(PackageJSON["@dek/plugins"])
+                }, {
+                    type: 'list',
+                    name: 'frontend',
+                    message: _i18n2.default.__("Do you want to install some frontend framework?"),
+                    choices: ["None", "Angular 7", "React", "Vue.js"]
                 }]).then(function (projectSettings2) {
                     projectSettings = _lodash2.default.merge(projectSettings, projectSettings2);
                     _this.settings = projectSettings;
@@ -241,21 +246,21 @@ var Init = exports.Init = function () {
             (0, _child_process.exec)(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, function (err, stdout, stderr) {
                 process.stdout.write(stdout + '\n');
                 process.stderr.write(stderr + '\n');
+
+                try {
+                    (0, _child_process.exec)(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, function (err, stdout, stderr) {
+                        process.stdout.write(stdout + '\n');
+                        process.stderr.write(stderr + '\n');
+
+                        if (err) console.log(_chalk2.default.red(err));else if (stderr) console.log(_chalk2.default.red(stderr));else {
+                            (0, _plugins.installPlugins)(self.settings);
+                        }
+                    });
+                } catch (e) {
+                    console.log(_chalk2.default.red(e.message));
+                    (0, _plugins.installPlugins)(self.settings);
+                }
             });
-
-            try {
-                (0, _child_process.exec)(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, function (err, stdout, stderr) {
-                    process.stdout.write(stdout + '\n');
-                    process.stderr.write(stderr + '\n');
-
-                    if (err) console.log(_chalk2.default.red(err));else if (stderr) console.log(_chalk2.default.red(stderr));else {
-                        (0, _plugins.installPlugins)(self.settings);
-                    }
-                });
-            } catch (e) {
-                console.log(_chalk2.default.red(e.message));
-                (0, _plugins.installPlugins)(self.settings);
-            }
         }
     }, {
         key: "installWebpack",

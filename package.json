@@ -31,7 +31,7 @@
     "bugs": {
         "url": "https://github.com/dekproject/CLI/issues"
     },
-    "homepage": "https://github.com/dekproject/CLI#readme",
+    "homepage": "https://github.com/dekproject/CLI",
     "dependencies": {
         "chalk": "^2.4.2",
         "clear": "^0.1.0",
@@ -42,14 +42,18 @@
         "inquirer-fuzzy-path": "^2.0.1",
         "lodash": "^4.17.11",
         "minimist": "^1.2.0",
-        "rimraf": "^2.6.3"
+        "npm": "^6.8.0",
+        "rimraf": "^2.6.3",
+        "react-dom": "^16.8.1",
+        "react": "^16.8.1"
     },
     "devDependencies": {
         "babel-cli": "^6.26.0",
         "babel-preset-env": "^1.7.0",
         "babel-preset-minify": "^0.5.0",
         "mocha": "^5.2.0",
-        "nodemon": "^1.18.9"
+        "nodemon": "^1.18.9",
+        "babel-preset-react": "^6.24.1"
     },
     "@dek/plugins": {
         "Express": "https://github.com/dekproject/express",
@@ -62,8 +66,8 @@
     },
     "@dek/scripts": {
         "cliDevMode": "sudo npm i -g nodemon",
-        "devMode": "export NODE_PATH=../node_modules && npm i babel-cli babel-preset-env babel-preset-minify nodemon mocha --save-dev",
-        "webpack": "npm i --save-dev webpack webpack-cli webpack-dev-server html-webpack-plugin babel-core babel-loader babel-preset-es2015",
-        "react": "npm i react react-dom --save && npm i babel-preset-react --save-dev"
+        "devMode": "babel-cli babel-preset-env babel-preset-minify nodemon mocha --save-dev",
+        "webpack": "webpack webpack-cli webpack-dev-server html-webpack-plugin babel-core babel-loader babel-preset-es2015 --save-dev",
+        "react": "react react-dom --save && babel-preset-react --save-dev"
     }
 }

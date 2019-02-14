@@ -1,4 +1,4 @@
-var init = require("build/init");
+var init = require("src/init");
 
 var assert = require('assert');
 
