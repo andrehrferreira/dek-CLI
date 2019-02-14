@@ -24,6 +24,10 @@ module.exports = (self) => {
                 }
             ]
         },
+        stats: {
+            colors: true
+        },
+        devtool: 'source-map',
         plugins: []
     };
 
@@ -45,6 +49,7 @@ module.exports = (self) => {
     } catch(e){ }
 
     return `
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const env = process.env.NODE_ENV;
 
