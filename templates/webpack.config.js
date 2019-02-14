@@ -2,9 +2,9 @@ let path = require("path");
 
 module.exports = (self) => {
     var template = {
-        entry: path.join(self.settings.path, 'public', 'main.js'),
+        entry: path.join(self.settings.path, 'public/src', 'main.js'),
         output: {
-            path: path.join(self.settings.path, 'public'),
+            path: path.join(self.settings.path, 'public/build'),
             filename: 'bundle.js'
         },
         optimization: {
