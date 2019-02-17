@@ -4,16 +4,16 @@ CLI for Dek
 
 What does the CLI do?
 
-```
-- Create a base project
-- Has an optional base skeleton to facilitate the development (https://github.com/dekproject/boostrap)
-- Installs development components (cross-env, mocha, nodemon, babel-cli, etc)
-- Configure Webpack and Babel for ES6 (Client and Server)
-- It has plugins for basic services (Express, MongoDB, Redis, Authentication, etc)
-- Set up production and development environment for Angular, React and Vue.js
-- Generates configuration file for Docker and Docker-compose
-- Be happy =)
-```
+
+* Create a base project
+* Has an optional base skeleton to facilitate the development (https://github.com/dekproject/boostrap)
+* Installs development components (cross-env, mocha, nodemon, babel-cli, etc)
+* Configure Webpack and Babel for ES6 (Client and Server)
+* It has plugins for basic services (Express, MongoDB, Redis, Authentication, etc)
+* Set up production and development environment for Angular, React and Vue.js
+* Generates configuration file for Docker and Docker-compose
+* Be happy =)
+
 
 ### Instalation
 
