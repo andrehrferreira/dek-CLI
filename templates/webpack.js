@@ -5,12 +5,8 @@ module.exports = (self) => {
         entry: path.join(self.settings.path, 'public/src', 'main.js'),
         output: {
             path: path.join(self.settings.path, 'public/build'),
+            publicPath: "public/build",
             filename: 'bundle.js'
-        },
-        optimization: {
-            splitChunks: {
-                chunks: 'all'
-            }
         },
         module: {
             rules: [
@@ -23,9 +19,6 @@ module.exports = (self) => {
                     }
                 }
             ]
-        },
-        stats: {
-            colors: true
         },
         devtool: 'source-map',
         plugins: []
@@ -41,20 +34,26 @@ module.exports = (self) => {
                 });
             break;
             case "react":
-                template.module.rules[0].query.presets.push("react");
+                //template.module.rules[0].query.presets.push("react");
             break;
             case "angular": break;
             default: break;
         }
     } catch(e){ }
 
-    return `
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const env = process.env.NODE_ENV;
+    return {
+        "script": "",
+        "import": `
+            const webpack = require('webpack');
+            const babiliPlugin = require('babili-webpack-plugin');
+        `,
+        "template": `
+            const config = ${JSON.stringify(template, null, 4)};
 
-const config = ${JSON.stringify(template, null, 4)};
+            if(process.env.NODE_ENV == 'production')
+                config.plugins.push(new babiliPlugin())
 
-module.exports = config;`;
-
+            module.exports = config;
+        `
+    };
 }

@@ -15,6 +15,10 @@ var _path = require("path");
 
 var _path2 = _interopRequireDefault(_path);
 
+var _npm = require("npm");
+
+var _npm2 = _interopRequireDefault(_npm);
+
 require("babel-polyfill");
 
 var _minimist = require("minimist");
@@ -47,11 +51,11 @@ var _rimraf2 = _interopRequireDefault(_rimraf);
 
 var _child_process = require("child_process");
 
-var _plugins = require("./plugins");
+var _yaml = require("yaml");
+
+var _yaml2 = _interopRequireDefault(_yaml);
 
 var _install = require("./install");
-
-var _install2 = _interopRequireDefault(_install);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -170,12 +174,14 @@ var Init = exports.Init = function () {
     }, {
         key: "unlinkGitAndPackage",
         value: function unlinkGitAndPackage(self) {
+            _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "dek.yaml"), _yaml2.default.stringify(self.settings));
+
             try {
-                console.log(_chalk2.default.green(_i18n2.default.__("Unlink package.json")));
+                console.log(_chalk2.default.green(_i18n2.default.__("Unlink boostrap package.json")));
                 _fs2.default.unlinkSync(_path2.default.join(self.settings.path, "package.json"));
             } catch (e) {/*console.log(chalk.red(e.message));*/}
 
-            console.log(_chalk2.default.green(_i18n2.default.__("Unlink " + _path2.default.join(self.settings.path, ".git"))));
+            console.log(_chalk2.default.green(_i18n2.default.__("Unlink boostrap " + _path2.default.join(self.settings.path, ".git"))));
 
             (0, _rimraf2.default)(_path2.default.join(self.settings.path, ".git"), function () {
                 self.createGitAndPackage(self);
@@ -184,9 +190,7 @@ var Init = exports.Init = function () {
     }, {
         key: "createGitAndPackage",
         value: function createGitAndPackage(self) {
-            var _this2 = this;
-
-            console.log(_chalk2.default.green(_i18n2.default.__("Creating package.json ...")));
+            console.log(_chalk2.default.green(_i18n2.default.__("Creating project package.json ...")));
 
             console.log(_path2.default.join(process.cwd(), "templates", "package.json.js"));
             var packageJSONTemplate = require(_path2.default.join(process.cwd(), "templates", "package.json.js"));
@@ -206,74 +210,34 @@ var Init = exports.Init = function () {
                 };
             }
 
-            console.log(packageJSONTemplate);
-
-            if (this.settings.webpack) packageJSONTemplate.scripts.build += " && webpack --mode production --progress";
+            if (this.settings.webpack) {
+                packageJSONTemplate.scripts.dev += " && webpack-dev-server";
+                packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
+            }
 
             _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "package.json"), JSON.stringify(packageJSONTemplate, null, 4));
 
             if (self.settings.repository != "") {
-                console.log(_chalk2.default.green(_i18n2.default.__("Creating .git ...")));
+                console.log(_chalk2.default.green(_i18n2.default.__("Creating project .git ...")));
 
                 (0, _child_process.exec)("git init", { cwd: self.settings.path }, function (err, stdout, stderr) {
                     process.stdout.write(stdout + '\n');
                     process.stderr.write(stderr + '\n');
 
-                    if (err) console.log(_chalk2.default.red(err));else if (stderr) console.log(_chalk2.default.red(stderr));else {
+                    if (err) console.log(_chalk2.default.red(err));else {
                         (0, _child_process.exec)("git remote add origin " + self.settings.repository, { cwd: self.settings.path }, function (err, stdout, stderr) {
                             process.stdout.write(stdout + '\n');
                             process.stderr.write(stderr + '\n');
 
-                            if (err) console.log(_chalk2.default.red(err));else if (stderr) console.log(_chalk2.default.red(stderr));else {
-                                if (_this2.settings.devmode) self.installDevMode(self);else (0, _plugins.installPlugins)(self.settings);
-
-                                if (_this2.settings.webpack) self.installWebpack(self);
+                            if (err) console.log(_chalk2.default.red(err));else {
+                                new _install.Install().bootstrap(self, packageJSONTemplate);
                             }
                         });
                     }
                 });
             } else {
-                if (this.settings.devmode) self.installDevMode(self);else (0, _plugins.installPlugins)(self.settings);
-
-                if (this.settings.webpack) self.installWebpack(self);
+                new _install.Install().bootstrap(self, packageJSONTemplate);
             }
-        }
-    }, {
-        key: "installDevMode",
-        value: function installDevMode(self) {
-            console.log(_chalk2.default.green(_i18n2.default.__("Install dev mode ...")));
-
-            (0, _child_process.exec)(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, function (err, stdout, stderr) {
-                process.stdout.write(stdout + '\n');
-                process.stderr.write(stderr + '\n');
-
-                try {
-                    (0, _child_process.exec)(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, function (err, stdout, stderr) {
-                        process.stdout.write(stdout + '\n');
-                        process.stderr.write(stderr + '\n');
-
-                        if (err) console.log(_chalk2.default.red(err));else if (stderr) console.log(_chalk2.default.red(stderr));else {
-                            (0, _plugins.installPlugins)(self.settings);
-                        }
-                    });
-                } catch (e) {
-                    console.log(_chalk2.default.red(e.message));
-                    (0, _plugins.installPlugins)(self.settings);
-                }
-            });
-        }
-    }, {
-        key: "installWebpack",
-        value: function installWebpack(self) {
-            console.log(_chalk2.default.green(_i18n2.default.__("Install Webpack ...")));
-
-            (0, _child_process.exec)(PackageJSON["@dek/scripts"].webpack, { cwd: self.settings.path }, function (err, stdout, stderr) {
-                process.stdout.write(stdout + '\n');
-                process.stderr.write(stderr + '\n');
-
-                var WebpackConfigTemplate = require(_path2.default.join(process.cwd(), "templates", "webpack.config.js"))(self);
-                _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate(self));
-            });
         }
     }, {
         key: "directoryExists",

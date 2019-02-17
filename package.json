@@ -6,7 +6,7 @@
     "scripts": {
         "test": "npm run build && mocha",
         "build": "babel src -s -D -d build --presets env",
-        "testbin": "node build",
+        "dev": "babel-node src --presets env",
         "start": "npm run build && node build"
     },
     "bin": {
@@ -51,9 +51,10 @@
         "babel-cli": "^6.26.0",
         "babel-preset-env": "^1.7.0",
         "babel-preset-minify": "^0.5.0",
+        "babel-preset-react": "^6.24.1",
+        "cross-env": "^5.2.0",
         "mocha": "^5.2.0",
-        "nodemon": "^1.18.9",
-        "babel-preset-react": "^6.24.1"
+        "nodemon": "^1.18.9"
     },
     "@dek/plugins": {
         "Express": "https://github.com/dekproject/express",
@@ -66,8 +67,14 @@
     },
     "@dek/scripts": {
         "cliDevMode": "sudo npm i -g nodemon",
-        "devMode": "babel-cli babel-preset-env babel-preset-minify nodemon mocha --save-dev",
-        "webpack": "webpack webpack-cli webpack-dev-server html-webpack-plugin babel-core babel-loader babel-preset-es2015 --save-dev",
-        "react": "react react-dom --save && babel-preset-react --save-dev"
+        "devMode": "babel-cli babel-preset-env babel-preset-minify nodemon mocha cross-env --save-dev",
+        "webpack": "webpack webpack-cli webpack-dev-server babel-core babel-loader babel-preset-es2015 babili-webpack-plugin --save-dev",
+        "webpackLoaders": "css-loader style-loader url-loader file-loader --save-dev",
+    },
+    "@dek/frontend": {
+        "nuxt": "npx create-nuxt-app public",
+        "angular": "sudo npm install -g @angular/cli && ng new public",
+        "react": "npx create-react-app public",
+        "ember": "sudo npm install -g ember-cli && ember new public"
     }
 }

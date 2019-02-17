@@ -11,9 +11,9 @@ import _ from "lodash";
 import gitClone from "git-clone";
 import rimraf from "rimraf";
 import { exec } from "child_process";
+import YAML from 'yaml';
 
-import { installPlugins } from "./plugins";
-import Install from "./install";
+import { Install } from "./install";
 
 const PackageJSON = require(path.join(process.cwd(), "package"));
 
@@ -28,8 +28,10 @@ i18n.configure({
 
 export class Init{
     Prompt(){
+        var self = this;
+
         prompt([
-            {
+            /*{
                 type: "list",
                 name: "lang",
                 choices: ["en", "ptBR"],
@@ -38,7 +40,7 @@ export class Init{
                     i18n.setLocale(value);
                     true;
                 }
-            },
+            },*/
             {
                 type: "input",
                 name: "name",
@@ -76,6 +78,21 @@ export class Init{
                 type: 'input',
                 name: 'repository',
                 message: i18n.__("What is the repository of this project?"),
+                validate: (value) => {
+                    if(value !== ""){
+                        if (/(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/.test(value))
+                            return true;
+                        else
+                            return i18n.__("Please set a valid repository url");
+                    }
+                    else{
+                        return true;
+                    }
+                }
+            }, {
+                type: 'confirm',
+                name: 'skeleton',
+                message: i18n.__("Do you want to use DEK skeleton?"),
             }, {
                 type: 'confirm',
                 name: 'devmode',
@@ -85,19 +102,28 @@ export class Init{
                 name: 'webpack',
                 message: i18n.__("Do you want to install Webpack to optimize your frontend?"),
             }, {
-                type: 'checkbox',
-                name: 'plugins',
-                message: i18n.__("Select plugins for your project:"),
-                choices: Object.keys(PackageJSON["@dek/plugins"])
-            }, {
                 type: 'list',
                 name: 'frontend',
                 message: i18n.__("Do you want to install some frontend framework?"),
-                choices: ["None", "Angular 7", "React", "Vue.js"]
-            }]).then(projectSettings2 => {
-                projectSettings = _.merge(projectSettings, projectSettings2);
-                this.settings = projectSettings;
-                this.createProject();
+                choices: _.merge(["none"], Object.keys(PackageJSON["@dek/frontend"]))
+            }]).then(projectConfirms => {
+                if(projectConfirms.skeleton){
+                    prompt([{
+                            type: 'checkbox',
+                            name: 'plugins',
+                            message: i18n.__("Select plugins for your project:"),
+                            choices: Object.keys(PackageJSON["@dek/plugins"])
+                    }]).then(projectSettingsPlugins => {
+                        let settings = _.merge(projectSettings, projectConfirms, projectSettingsPlugins);
+                        self.settings = settings;
+                        self.createProject();
+                    });
+                }
+                else{
+                    settings = _.merge(projectSettings, projectConfirms);
+                    self.settings = settings;
+                    self.createProject();
+                }
             });;
         });
     }
@@ -128,12 +154,14 @@ export class Init{
     }
 
     unlinkGitAndPackage(self){
+        fs.writeFileSync(path.join(self.settings.path, "dek.yaml"), YAML.stringify(self.settings));
+
         try{
-            console.log(chalk.green(i18n.__("Unlink package.json")));
+            console.log(chalk.green(i18n.__("Unlink boostrap package.json")));
             fs.unlinkSync(path.join(self.settings.path, "package.json"));
         } catch(e) { /*console.log(chalk.red(e.message));*/ }
 
-        console.log(chalk.green(i18n.__("Unlink " + path.join(self.settings.path, ".git"))));
+        console.log(chalk.green(i18n.__("Unlink boostrap " + path.join(self.settings.path, ".git"))));
 
         rimraf(path.join(self.settings.path, ".git"), () => {
             self.createGitAndPackage(self);
@@ -141,7 +169,7 @@ export class Init{
     }
 
     createGitAndPackage(self){
-        console.log(chalk.green(i18n.__("Creating package.json ...")));
+        console.log(chalk.green(i18n.__("Creating project package.json ...")));
 
         console.log(path.join(process.cwd(), "templates", "package.json.js"));
         var packageJSONTemplate = require(path.join(process.cwd(), "templates", "package.json.js"));
@@ -161,93 +189,42 @@ export class Init{
             }
         }
 
-        console.log(packageJSONTemplate);
-
-        if(this.settings.webpack)
-            packageJSONTemplate.scripts.build += " && webpack --mode production --progress";
+        if(this.settings.webpack){
+            packageJSONTemplate.scripts.dev += " && webpack-dev-server --host 0.0.0.0 --port 5555"
+            packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
+        }
 
         fs.writeFileSync(path.join(self.settings.path, "package.json"), JSON.stringify(packageJSONTemplate, null, 4));
 
         if(self.settings.repository != ""){
-            console.log(chalk.green(i18n.__("Creating .git ...")));
+            console.log(chalk.green(i18n.__("Creating project .git ...")));
 
             exec("git init", { cwd: self.settings.path }, (err, stdout, stderr) => {
                 process.stdout.write(stdout + '\n');
                 process.stderr.write(stderr + '\n');
 
                 if(err) console.log(chalk.red(err));
-                else if(stderr) console.log(chalk.red(stderr));
                 else{
                     exec("git remote add origin " + self.settings.repository, { cwd: self.settings.path }, (err, stdout, stderr) => {
                         process.stdout.write(stdout + '\n');
                         process.stderr.write(stderr + '\n');
 
                         if(err) console.log(chalk.red(err));
-                        else if(stderr) console.log(chalk.red(stderr));
                         else{
-                            if(this.settings.devmode)
-                                self.installDevMode(self);
-                            else
-                                installPlugins(self.settings);
-
-                            if(this.settings.webpack)
-                                self.installWebpack(self);
+                            new Install().bootstrap(self, packageJSONTemplate);
                         }
                     });
                 }
             });
         }
         else{
-            if(this.settings.devmode)
-                self.installDevMode(self);
-            else
-                installPlugins(self.settings);
-
-            if(this.settings.webpack)
-                self.installWebpack(self);
+            new Install().bootstrap(self, packageJSONTemplate);
         }
-    }
-
-    addPackageDependencies(script, settings, callback){
-        var sepScript = script.split("&&");
-        console.log();
-    }
-
-    installDevMode(self){
-        console.log(chalk.green(i18n.__("Install dev mode ...")));
-
-        exec(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
-            process.stdout.write(stdout + '\n');
-            process.stderr.write(stderr + '\n');
-
-            try{
-                self.addPackageDependencies(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, (err) => {
-                    if(err) console.log(chalk.red(err));
-                    else installPlugins(self.settings);
-                });
-            } catch(e){
-                console.log(chalk.red(e.message));
-                installPlugins(self.settings);
-            }
-        });
-    }
-
-    installWebpack(self){
-        console.log(chalk.green(i18n.__("Install Webpack ...")));
-
-        self.addPackageDependencies(PackageJSON["@dek/scripts"].webpack, { cwd: self.settings.path }, (err) => {
-            var WebpackConfigTemplate = require(path.join(process.cwd(), "templates", "webpack.config.js"))(self);
-            fs.writeFileSync(path.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate(self));
-        });
     }
 
     directoryExists(filePath){
-        try {
-            return fs.statSync(filePath).isDirectory();
-        }
-        catch (err) {
-            return false;
-        }
+        try { return fs.statSync(filePath).isDirectory(); }
+        catch (err) { return false; }
     }
 
     Help(){

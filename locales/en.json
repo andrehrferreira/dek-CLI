@@ -25,5 +25,9 @@
 	"Do you want to install Webpack to optimize your frontend?": "Do you want to install Webpack to optimize your frontend?",
 	"Do you want to install components for development mode?": "Do you want to install components for development mode?",
 	"Install Webpack ...": "Install Webpack ...",
-	"Do you want to install some frontend framework?": "Do you want to install some frontend framework?"
+	"Do you want to install some frontend framework?": "Do you want to install some frontend framework?",
+	"Unlink boostrap package.json": "Unlink boostrap package.json",
+	"Unlink boostrap /media/andre/DADOS/Projetos/Dek/CLI/myproject/.git": "Unlink boostrap /media/andre/DADOS/Projetos/Dek/CLI/myproject/.git",
+	"Creating project package.json ...": "Creating project package.json ...",
+	"Do you want to use DEK skeleton?": "Do you want to use DEK skeleton?"
 }
