@@ -2,7 +2,8 @@ module.exports = (self) => {
     return {
         name: self.settings.name,
         version: self.settings.version,
-        description: "",
+        description: self.settings.description,
+        author: self.settings.author,
         main: "src/index.js",
         scripts: {
             "test": "npm run build && mocha",

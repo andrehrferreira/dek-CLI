@@ -31,5 +31,11 @@
 	"Creating project package.json ...": "Creating project package.json ...",
 	"Do you want to use DEK skeleton?": "Do you want to use DEK skeleton?",
 	"Create package.json ...": "Create package.json ...",
-	"Install dependencies ...": "Install dependencies ..."
+	"Install dependencies ...": "Install dependencies ...",
+	"What is the author's name?": "What is the author's name?",
+	"Another DEK project": "Another DEK project",
+	"What is the project description?": "What is the project description?",
+	"Would you like to install dependencies via NPM?": "Would you like to install dependencies via NPM?",
+	"Please set a valid repository url": "Please set a valid repository url",
+	"Creating project .git ...": "Creating project .git ..."
 }

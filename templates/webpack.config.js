@@ -68,11 +68,11 @@ const config = ${JSON.stringify(template, null, 4)};
 config.plugins.push(new extractTextPlugin("styles.css"));
 
 config.module.rules.push({
-    test: /\.css$/,
+    test: new RegExp("\\\.css$"),
     use: extractTextPlugin.extract({
-         fallback: 'style-loader',
-         use: 'css-loader'
-     })
+        fallback: 'style-loader',
+        use: 'css-loader'
+    })
 });
 
 if(process.env.NODE_ENV == "production"){

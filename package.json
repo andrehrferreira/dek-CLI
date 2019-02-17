@@ -1,6 +1,6 @@
 {
     "name": "@dek/cli",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "CLI for Dek",
     "main": "index.js",
     "scripts": {
@@ -58,13 +58,12 @@
         "nodemon": "^1.18.9"
     },
     "@dek/plugins": {
-        "Express": "https://github.com/dekproject/express",
-        "MongoDB": "https://github.com/dekproject/mongodb",
-        "Redis": "https://github.com/dekproject/redis",
-        "Authentication": "https://github.com/dekproject/authentication",
-        "Elasticsearch": "https://github.com/dekproject/elasticsearch",
-        "TensorFlow": "https://github.com/dekproject/tensorflow",
-        "SendGrid": "https://github.com/dekproject/sendgrid"
+        "mongodb": "https://github.com/dekproject/mongodb",
+        "redis": "https://github.com/dekproject/redis",
+        "authentication": "https://github.com/dekproject/authentication",
+        "elasticsearch": "https://github.com/dekproject/elasticsearch",
+        "tensorflow": "https://github.com/dekproject/tensorflow",
+        "sendgrid": "https://github.com/dekproject/sendgrid"
     },
     "@dek/scripts": {
         "cliDevMode": "sudo npm i -g nodemon",

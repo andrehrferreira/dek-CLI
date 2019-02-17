@@ -7,9 +7,9 @@ What does the CLI do?
 
 * Create a base project
 * Has an optional base skeleton to facilitate the development (https://github.com/dekproject/boostrap)
-* Installs development components (cross-env, mocha, nodemon, babel-cli, etc)
-* Configure Webpack and Babel for ES6 (Client and Server)
-* It has plugins for basic services (MongoDB, Redis, Authentication, etc)
+* Installs development components (cross-env, mocha, nodemon, babel, etc)
+* Configure Webpack and Babel for ES6 (client and server)
+* It has plugins for basic services (mongoDB, redis, authentication, etc)
 * Set up production and development environment for Angular, React and Vue.js
 * Generates configuration file for Docker and Docker-compose
 * Be happy =)
@@ -43,7 +43,6 @@ $ npx create-dek-app
 The CLI will ask you some questions for configuring the **package.json** and **.git**.
 
 ```
-? What is your language? en
 ? What is the name of the project? myproject
 ? What is the version of the project? 1.0.0
 ? Directory for your project: /media/Dek/CLI/myproject
@@ -51,7 +50,7 @@ The CLI will ask you some questions for configuring the **package.json** and **.
 ? Do you want to use DEK skeleton? Yes
 ? Do you want to install components for development mode? Yes
 ? Do you want to install Webpack to optimize your frontend? Yes
-? Select plugins for your project: MongoDB, Redis
+? Select plugins for your project: mongoDB, redis
 ? Do you want to install some frontend framework?
 ```
 

@@ -17,6 +17,9 @@ import { installPlugins } from "./plugins";
 
 const PackageJSON = require(path.join(process.cwd(), "package"));
 
+let prompt = inquirer.createPromptModule();
+inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
+
 export class Install{
     async bootstrap(self, packageJSONTemplate){
         this.packageJSONTemplate = packageJSONTemplate;
@@ -42,23 +45,37 @@ export class Install{
                 fs.writeFile(path.join(self.settings.path, "package.json"), JSON.stringify(this.packageJSONTemplate, null, 4), async (err) => {
                     console.log(chalk.green(i18n.__("Install dependencies ...")));
 
-                    const manager = new PluginManager({
-                        cwd: self.settings.path
+                    prompt([{
+                        type: 'confirm',
+                        name: 'install',
+                        message: i18n.__("Would you like to install dependencies via NPM?"),
+                    }]).then(result => {
+                        if(result.install){
+                            exec("npm install", { cwd: self.settings.path }, (err, stdout, stderr) => {
+                                process.stdout.write(stdout + '\n');
+                                process.stderr.write(stderr + '\n');
+
+                                console.log(chalk.green(i18n.__("Install nodemon ...")));
+
+                                exec(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
+                                    process.stdout.write(stdout + '\n');
+                                    process.stderr.write(stderr + '\n');
+                                    return true;
+                                });
+                            });
+                        }
+                        else{
+                            const usageText = `
+    Project created successfully!
+
+    To start the project in development mode:
+    cd ${self.settings.path}
+    npm i -g nodemon && npm install
+    npm run dev`;
+
+                          console.log(usageText);
+                        }
                     });
-
-                    spawn("npm", ["install"], { cwd: self.settings.path, stdio: process.stdio }, () => {
-                        exec(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
-                            process.stdout.write(stdout + '\n');
-                            process.stderr.write(stderr + '\n');
-
-                            return true;
-                        });
-                    });
-
-                    /*exec("npm install", { cwd: self.settings.path }, (err, stdout, stderr) => {
-                        process.stdout.write(stdout + '\n');
-                        process.stderr.write(stderr + '\n');
-                    });*/
                 });
             }
         }, 1000);

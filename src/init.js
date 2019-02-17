@@ -52,8 +52,16 @@ export class Init{
                     else
                         return i18n.__("Please set a valid value");
                 }
-            },
-            {
+            }, {
+                type: "input",
+                name: "author",
+                message: i18n.__("What is the author's name?")
+            }, {
+                type: "input",
+                name: "description",
+                default: i18n.__("Another DEK project"),
+                message: i18n.__("What is the project description?")
+            }, {
                 type: "input",
                 name: "version",
                 default: "1.0.0",
@@ -153,7 +161,9 @@ export class Init{
         if(self.settings.skeleton){
             gitClone(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, err => {
                 if(err) reject(chalk.red(err));
-                else self.unlinkGitAndPackage(self);
+                else {
+                    self.unlinkGitAndPackage(self);
+                }
             });
         }
         else{
@@ -204,15 +214,9 @@ export class Init{
             console.log(chalk.green(i18n.__("Creating project .git ...")));
 
             exec("git init", { cwd: self.settings.path }, (err, stdout, stderr) => {
-                process.stdout.write(stdout + '\n');
-                process.stderr.write(stderr + '\n');
-
                 if(err) console.log(chalk.red(err));
                 else{
                     exec("git remote add origin " + self.settings.repository, { cwd: self.settings.path }, (err, stdout, stderr) => {
-                        process.stdout.write(stdout + '\n');
-                        process.stderr.write(stderr + '\n');
-
                         if(err) console.log(chalk.red(err));
                         else{
                             new Install().bootstrap(self, packageJSONTemplate);
