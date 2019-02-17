@@ -11,7 +11,7 @@ import _ from "lodash";
 import gitClone from "git-clone";
 import rimraf from "rimraf";
 import { exec } from "child_process";
-import YAML from 'yaml';
+//import YAML from 'yaml';
 
 import { Install } from "./install";
 
@@ -66,6 +66,9 @@ export class Init{
                 }
             },
         ]).then(projectSettings => {
+            var frontendChoices = Object.keys(PackageJSON["@dek/frontend"]);
+            frontendChoices.unshift("none");
+
             prompt([{
                 type: 'input',
                 name: 'path',
@@ -105,7 +108,7 @@ export class Init{
                 type: 'list',
                 name: 'frontend',
                 message: i18n.__("Do you want to install some frontend framework?"),
-                choices: _.merge(["none"], Object.keys(PackageJSON["@dek/frontend"]))
+                choices: frontendChoices
             }]).then(projectConfirms => {
                 if(projectConfirms.skeleton){
                     prompt([{
@@ -147,14 +150,19 @@ export class Init{
     cloneSkeleton(self){
         console.log(chalk.green(i18n.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
-        gitClone(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, err => {
-            if(err) reject(chalk.red(err));
-            else self.unlinkGitAndPackage(self);
-        });
+        if(self.settings.skeleton){
+            gitClone(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, err => {
+                if(err) reject(chalk.red(err));
+                else self.unlinkGitAndPackage(self);
+            });
+        }
+        else{
+            self.createGitAndPackage(self);
+        }
     }
 
     unlinkGitAndPackage(self){
-        fs.writeFileSync(path.join(self.settings.path, "dek.yaml"), YAML.stringify(self.settings));
+        //fs.writeFileSync(path.join(self.settings.path, "dek.yaml"), YAML.stringify(self.settings));
 
         try{
             console.log(chalk.green(i18n.__("Unlink boostrap package.json")));
@@ -171,9 +179,7 @@ export class Init{
     createGitAndPackage(self){
         console.log(chalk.green(i18n.__("Creating project package.json ...")));
 
-        console.log(path.join(process.cwd(), "templates", "package.json.js"));
         var packageJSONTemplate = require(path.join(process.cwd(), "templates", "package.json.js"));
-        console.log(packageJSONTemplate);
         packageJSONTemplate = packageJSONTemplate(self);
 
         if(self.settings.repository != ""){
@@ -193,8 +199,6 @@ export class Init{
             packageJSONTemplate.scripts.dev += " && webpack-dev-server --host 0.0.0.0 --port 5555"
             packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
         }
-
-        fs.writeFileSync(path.join(self.settings.path, "package.json"), JSON.stringify(packageJSONTemplate, null, 4));
 
         if(self.settings.repository != ""){
             console.log(chalk.green(i18n.__("Creating project .git ...")));

@@ -40,12 +40,13 @@
         "i18n": "^0.8.3",
         "inquirer": "^6.2.2",
         "inquirer-fuzzy-path": "^2.0.1",
+        "live-plugin-manager": "^0.12.0",
         "lodash": "^4.17.11",
         "minimist": "^1.2.0",
         "npm": "^6.8.0",
-        "rimraf": "^2.6.3",
+        "react": "^16.8.1",
         "react-dom": "^16.8.1",
-        "react": "^16.8.1"
+        "rimraf": "^2.6.3"
     },
     "devDependencies": {
         "babel-cli": "^6.26.0",
@@ -69,7 +70,7 @@
         "cliDevMode": "sudo npm i -g nodemon",
         "devMode": "babel-cli babel-preset-env babel-preset-minify nodemon mocha cross-env --save-dev",
         "webpack": "webpack webpack-cli webpack-dev-server babel-core babel-loader babel-preset-es2015 babili-webpack-plugin --save-dev",
-        "webpackLoaders": "css-loader style-loader url-loader file-loader --save-dev",
+        "webpackLoaders": "css-loader style-loader url-loader file-loader extract-text-webpack-plugin optimize-css-assets-webpack-plugin cssnano --save-dev"
     },
     "@dek/frontend": {
         "nuxt": "npx create-nuxt-app public",

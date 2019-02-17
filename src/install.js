@@ -10,55 +10,133 @@ import i18n from "i18n";
 import _ from "lodash";
 import gitClone from "git-clone";
 import rimraf from "rimraf";
-import { exec } from "child_process";
+import { exec, spawn } from "child_process";
+import { PluginManager } from "live-plugin-manager";
 
 import { installPlugins } from "./plugins";
 
 const PackageJSON = require(path.join(process.cwd(), "package"));
 
 export class Install{
-    bootstrap(self, packageJSONTemplate){
-        console.log(packageJSONTemplate);
+    async bootstrap(self, packageJSONTemplate){
+        this.packageJSONTemplate = packageJSONTemplate;
+
+        if(self.settings.devmode)
+            await this.installDevMode(self);
+        else
+            this.installedDevMode = true;
+
+        if(self.settings.webpack)
+            await this.installWebpack(self);
+        else
+            this.installedWebpack = true;
+
+        //if(self.settings.skeleton)
+        //    installPlugins(self, packageJSONTemplate);
+
+        var installInterval = setInterval(() => {
+            if(this.installedDevMode && this.installedWebpack){
+                clearInterval(installInterval);
+                console.log(chalk.green(i18n.__("Create package.json ...")));
+
+                fs.writeFile(path.join(self.settings.path, "package.json"), JSON.stringify(this.packageJSONTemplate, null, 4), async (err) => {
+                    console.log(chalk.green(i18n.__("Install dependencies ...")));
+
+                    const manager = new PluginManager({
+                        cwd: self.settings.path
+                    });
+
+                    spawn("npm", ["install"], { cwd: self.settings.path, stdio: process.stdio }, () => {
+                        exec(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
+                            process.stdout.write(stdout + '\n');
+                            process.stderr.write(stderr + '\n');
+
+                            return true;
+                        });
+                    });
+
+                    /*exec("npm install", { cwd: self.settings.path }, (err, stdout, stderr) => {
+                        process.stdout.write(stdout + '\n');
+                        process.stderr.write(stderr + '\n');
+                    });*/
+                });
+            }
+        }, 1000);
     }
 
     installDevMode(self){
+        this.installedDevMode = false;
         console.log(chalk.green(i18n.__("Install dev mode ...")));
 
-        exec(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
-            process.stdout.write(stdout + '\n');
-            process.stderr.write(stderr + '\n');
-
-            try{
-                self.addPackageDependencies(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, (err) => {
-                    if(err) console.log(chalk.red(err));
-                    else installPlugins(self.settings);
-                });
-            } catch(e){
-                console.log(chalk.red(e.message));
-                installPlugins(self.settings);
-            }
-        });
+        try{
+            this.addPackageDependencies(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, () => {
+                this.installedDevMode = true;
+            });
+        } catch(e){
+            console.log(chalk.red(e.message));
+        }
     }
 
     installWebpack(self){
+        this.installedWebpack = false;
         console.log(chalk.green(i18n.__("Install Webpack ...")));
 
-        self.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, (err) => {
+        return this.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, () => {
             var WebpackConfigTemplate = require(path.join(process.cwd(), "templates", "webpack.config.js"))(self);
-            fs.writeFileSync(path.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate(self));
+            fs.writeFileSync(path.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate);
+
+            this.installedWebpack = true;
+            return true;
         });
     }
 
-    addPackageDependencies(scripts, settings, callback){
+    async addPackageDependencies(scripts, settings, callback){
+        var totalScripts = 0, loadedScripts = 0;
+
         if(typeof scripts == "string")
             scripts = [scripts];
 
-        scripts.forEach(() => {
+        await npm.load({}, (err) => {
+            scripts.forEach((parScript) => {
+                if(/--save-dev/.test(parScript)){
+                    parScript = parScript.replace("--save-dev", "");
 
+                    parScript.split(" ").forEach((dependency) => {
+                        if(dependency && dependency != ""){
+                            totalScripts++;
+
+                            npm.commands.show([dependency, 'name'], (err, rawData) => {
+                                loadedScripts++;
+                                this.packageJSONTemplate.devDependencies[dependency] = "^" + Object.keys(rawData)[0];
+                            });
+                        }
+                    });
+                }
+                else {
+                    parScript = parScript.replace("--save", "");
+
+                    parScript.split(" ").forEach((dependency) => {
+                        if(dependency && dependency != ""){
+                            totalScripts++;
+
+                            npm.commands.show([dependency, 'name'], (err, rawData) => {
+                                loadedScripts++;
+                                this.packageJSONTemplate.dependencies[dependency] = "^" + Object.keys(rawData)[0];
+                            });
+                        }
+                    });
+                }
+            });
+
+            if(typeof callback == "function"){
+                var pCallback = setInterval(() => {
+                    if(loadedScripts === totalScripts){
+                        callback();
+                        clearInterval(pCallback);
+                    }
+                }, 1000);
+            }
         });
-
-        //var sepScript = script.split("&&");
-        //console.log();
     }
 
     Help(){

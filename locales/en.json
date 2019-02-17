@@ -29,5 +29,7 @@
 	"Unlink boostrap package.json": "Unlink boostrap package.json",
 	"Unlink boostrap /media/andre/DADOS/Projetos/Dek/CLI/myproject/.git": "Unlink boostrap /media/andre/DADOS/Projetos/Dek/CLI/myproject/.git",
 	"Creating project package.json ...": "Creating project package.json ...",
-	"Do you want to use DEK skeleton?": "Do you want to use DEK skeleton?"
+	"Do you want to use DEK skeleton?": "Do you want to use DEK skeleton?",
+	"Create package.json ...": "Create package.json ...",
+	"Install dependencies ...": "Install dependencies ..."
 }

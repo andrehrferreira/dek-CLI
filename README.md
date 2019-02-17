@@ -9,11 +9,10 @@ What does the CLI do?
 * Has an optional base skeleton to facilitate the development (https://github.com/dekproject/boostrap)
 * Installs development components (cross-env, mocha, nodemon, babel-cli, etc)
 * Configure Webpack and Babel for ES6 (Client and Server)
-* It has plugins for basic services (Express, MongoDB, Redis, Authentication, etc)
+* It has plugins for basic services (MongoDB, Redis, Authentication, etc)
 * Set up production and development environment for Angular, React and Vue.js
 * Generates configuration file for Docker and Docker-compose
 * Be happy =)
-
 
 ### Instalation
 
@@ -33,6 +32,12 @@ $ dek [help/h/?]
 
 ```bash
 $ dek init
+```
+
+or
+
+```bash
+$ npx create-dek-app
 ```
 
 The CLI will ask you some questions for configuring the **package.json** and **.git**.
@@ -57,7 +62,7 @@ $ dek [install/i] //Install all plugins
 ```
 
 ```bash
-$ dek [install/i] Express MongoDB Authentication
+$ dek [install/i] MongoDB Redis Authentication
 ```
 
 ```bash
