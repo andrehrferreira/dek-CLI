@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.Init = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+//import YAML from 'yaml';
 
 var _fs = require("fs");
 
@@ -51,10 +52,6 @@ var _rimraf2 = _interopRequireDefault(_rimraf);
 
 var _child_process = require("child_process");
 
-var _yaml = require("yaml");
-
-var _yaml2 = _interopRequireDefault(_yaml);
-
 var _install = require("./install");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -82,18 +79,20 @@ var Init = exports.Init = function () {
     _createClass(Init, [{
         key: "Prompt",
         value: function Prompt() {
-            var _this = this;
+            var self = this;
 
-            prompt([{
+            prompt([
+            /*{
                 type: "list",
                 name: "lang",
                 choices: ["en", "ptBR"],
                 message: "What is your language?",
-                validate: function validate(value) {
-                    _i18n2.default.setLocale(value);
+                validate: (value) => {
+                    i18n.setLocale(value);
                     true;
                 }
-            }, {
+            },*/
+            {
                 type: "input",
                 name: "name",
                 default: _i18n2.default.__("myproject"),
@@ -103,6 +102,15 @@ var Init = exports.Init = function () {
                 }
             }, {
                 type: "input",
+                name: "author",
+                message: _i18n2.default.__("What is the author's name?")
+            }, {
+                type: "input",
+                name: "description",
+                default: _i18n2.default.__("Another DEK project"),
+                message: _i18n2.default.__("What is the project description?")
+            }, {
+                type: "input",
                 name: "version",
                 default: "1.0.0",
                 message: _i18n2.default.__("What is the version of the project?"),
@@ -110,6 +118,9 @@ var Init = exports.Init = function () {
                     if (value.length) return true;else return _i18n2.default.__("Please set a valid value");
                 }
             }]).then(function (projectSettings) {
+                var frontendChoices = Object.keys(PackageJSON["@dek/frontend"]);
+                frontendChoices.unshift("none");
+
                 prompt([{
                     type: 'input',
                     name: 'path',
@@ -121,29 +132,47 @@ var Init = exports.Init = function () {
                 }, {
                     type: 'input',
                     name: 'repository',
-                    message: _i18n2.default.__("What is the repository of this project?")
+                    message: _i18n2.default.__("What is the repository of this project?"),
+                    validate: function validate(value) {
+                        if (value !== "") {
+                            if (/(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/.test(value)) return true;else return _i18n2.default.__("Please set a valid repository url");
+                        } else {
+                            return true;
+                        }
+                    }
+                }, {
+                    type: 'confirm',
+                    name: 'skeleton',
+                    message: _i18n2.default.__("Do you want to use DEK skeleton?")
                 }, {
                     type: 'confirm',
                     name: 'devmode',
-                    message: _i18n2.default.__("Do you want to install components for development mode?")
-                }, {
-                    type: 'confirm',
-                    name: 'webpack',
-                    message: _i18n2.default.__("Do you want to install Webpack to optimize your frontend?")
-                }, {
-                    type: 'checkbox',
-                    name: 'plugins',
-                    message: _i18n2.default.__("Select plugins for your project:"),
-                    choices: Object.keys(PackageJSON["@dek/plugins"])
-                }, {
+                    message: _i18n2.default.__("Do you want to install components for development mode?") /*, {
+                                                                                                             type: 'confirm',
+                                                                                                             name: 'webpack',
+                                                                                                             message: i18n.__("Do you want to install Webpack to optimize your frontend?"),
+                                                                                                          }*/ }, {
                     type: 'list',
                     name: 'frontend',
                     message: _i18n2.default.__("Do you want to install some frontend framework?"),
-                    choices: ["None", "Angular 7", "React", "Vue.js"]
-                }]).then(function (projectSettings2) {
-                    projectSettings = _lodash2.default.merge(projectSettings, projectSettings2);
-                    _this.settings = projectSettings;
-                    _this.createProject();
+                    choices: frontendChoices
+                }]).then(function (projectConfirms) {
+                    if (projectConfirms.skeleton) {
+                        prompt([{
+                            type: 'checkbox',
+                            name: 'plugins',
+                            message: _i18n2.default.__("Select plugins for your project:"),
+                            choices: Object.keys(PackageJSON["@dek/plugins"])
+                        }]).then(function (projectSettingsPlugins) {
+                            var settings = _lodash2.default.merge(projectSettings, projectConfirms, projectSettingsPlugins);
+                            self.settings = settings;
+                            self.createProject();
+                        });
+                    } else {
+                        settings = _lodash2.default.merge(projectSettings, projectConfirms);
+                        self.settings = settings;
+                        self.createProject();
+                    }
                 });;
             });
         }
@@ -167,14 +196,20 @@ var Init = exports.Init = function () {
         value: function cloneSkeleton(self) {
             console.log(_chalk2.default.green(_i18n2.default.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
-            (0, _gitClone2.default)(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, function (err) {
-                if (err) reject(_chalk2.default.red(err));else self.unlinkGitAndPackage(self);
-            });
+            if (self.settings.skeleton) {
+                (0, _gitClone2.default)(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, function (err) {
+                    if (err) reject(_chalk2.default.red(err));else {
+                        self.unlinkGitAndPackage(self);
+                    }
+                });
+            } else {
+                self.createGitAndPackage(self);
+            }
         }
     }, {
         key: "unlinkGitAndPackage",
         value: function unlinkGitAndPackage(self) {
-            _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "dek.yaml"), _yaml2.default.stringify(self.settings));
+            //fs.writeFileSync(path.join(self.settings.path, "dek.yaml"), YAML.stringify(self.settings));
 
             try {
                 console.log(_chalk2.default.green(_i18n2.default.__("Unlink boostrap package.json")));
@@ -192,9 +227,7 @@ var Init = exports.Init = function () {
         value: function createGitAndPackage(self) {
             console.log(_chalk2.default.green(_i18n2.default.__("Creating project package.json ...")));
 
-            console.log(_path2.default.join(process.cwd(), "templates", "package.json.js"));
             var packageJSONTemplate = require(_path2.default.join(process.cwd(), "templates", "package.json.js"));
-            console.log(packageJSONTemplate);
             packageJSONTemplate = packageJSONTemplate(self);
 
             if (self.settings.repository != "") {
@@ -211,24 +244,16 @@ var Init = exports.Init = function () {
             }
 
             if (this.settings.webpack) {
-                packageJSONTemplate.scripts.dev += " && webpack-dev-server";
-                packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
+                //packageJSONTemplate.scripts.dev += " && webpack-dev-server --host 0.0.0.0 --port 5555"
+                //packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
             }
-
-            _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "package.json"), JSON.stringify(packageJSONTemplate, null, 4));
 
             if (self.settings.repository != "") {
                 console.log(_chalk2.default.green(_i18n2.default.__("Creating project .git ...")));
 
                 (0, _child_process.exec)("git init", { cwd: self.settings.path }, function (err, stdout, stderr) {
-                    process.stdout.write(stdout + '\n');
-                    process.stderr.write(stderr + '\n');
-
                     if (err) console.log(_chalk2.default.red(err));else {
                         (0, _child_process.exec)("git remote add origin " + self.settings.repository, { cwd: self.settings.path }, function (err, stdout, stderr) {
-                            process.stdout.write(stdout + '\n');
-                            process.stderr.write(stderr + '\n');
-
                             if (err) console.log(_chalk2.default.red(err));else {
                                 new _install.Install().bootstrap(self, packageJSONTemplate);
                             }

@@ -37,5 +37,7 @@
 	"What is the project description?": "What is the project description?",
 	"Would you like to install dependencies via NPM?": "Would you like to install dependencies via NPM?",
 	"Please set a valid repository url": "Please set a valid repository url",
-	"Creating project .git ...": "Creating project .git ..."
+	"Creating project .git ...": "Creating project .git ...",
+	"Unlink boostrap /home/andre/Projetos/Dek/CLI/myproject/.git": "Unlink boostrap /home/andre/Projetos/Dek/CLI/myproject/.git",
+	"Install frontend framework ...": "Install frontend framework ..."
 }

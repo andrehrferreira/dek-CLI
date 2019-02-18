@@ -108,11 +108,11 @@ export class Init{
                 type: 'confirm',
                 name: 'devmode',
                 message: i18n.__("Do you want to install components for development mode?"),
-            }, {
+            }/*, {
                 type: 'confirm',
                 name: 'webpack',
                 message: i18n.__("Do you want to install Webpack to optimize your frontend?"),
-            }, {
+            }*/, {
                 type: 'list',
                 name: 'frontend',
                 message: i18n.__("Do you want to install some frontend framework?"),
@@ -160,7 +160,7 @@ export class Init{
 
         if(self.settings.skeleton){
             gitClone(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, err => {
-                if(err) reject(chalk.red(err));
+                if(err) console.log(chalk.red(err));
                 else {
                     self.unlinkGitAndPackage(self);
                 }
@@ -206,8 +206,8 @@ export class Init{
         }
 
         if(this.settings.webpack){
-            packageJSONTemplate.scripts.dev += " && webpack-dev-server --host 0.0.0.0 --port 5555"
-            packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
+            //packageJSONTemplate.scripts.dev += " && webpack-dev-server --host 0.0.0.0 --port 5555"
+            //packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
         }
 
         if(self.settings.repository != ""){

@@ -61,6 +61,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var PackageJSON = require(_path2.default.join(process.cwd(), "package"));
 
+var prompt = _inquirer2.default.createPromptModule();
+_inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
+
 var Install = exports.Install = function () {
     function Install() {
         _classCallCheck(this, Install);
@@ -68,52 +71,242 @@ var Install = exports.Install = function () {
 
     _createClass(Install, [{
         key: "bootstrap",
-        value: function bootstrap(self, packageJSONTemplate) {
-            console.log(packageJSONTemplate);
+        value: function () {
+            var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(self, packageJSONTemplate) {
+                var _this = this;
+
+                var installInterval;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.packageJSONTemplate = packageJSONTemplate;
+
+                                if (!self.settings.devmode) {
+                                    _context2.next = 6;
+                                    break;
+                                }
+
+                                _context2.next = 4;
+                                return this.installDevMode(self);
+
+                            case 4:
+                                _context2.next = 7;
+                                break;
+
+                            case 6:
+                                this.installedDevMode = true;
+
+                            case 7:
+                                if (!(self.settings.frontend != "none")) {
+                                    _context2.next = 12;
+                                    break;
+                                }
+
+                                _context2.next = 10;
+                                return this.installFrontendFramework(self);
+
+                            case 10:
+                                _context2.next = 13;
+                                break;
+
+                            case 12:
+                                this.installedFrontend = true;
+
+                            case 13:
+                                //if(self.settings.skeleton)
+                                //    installPlugins(self, packageJSONTemplate);
+
+                                installInterval = setInterval(function () {
+                                    if (_this.installedDevMode && _this.installedWebpack && _this.installedFrontend) {
+                                        clearInterval(installInterval);
+                                        console.log(_chalk2.default.green(_i18n2.default.__("Create package.json ...")));
+
+                                        _fs2.default.writeFile(_path2.default.join(self.settings.path, "package.json"), JSON.stringify(_this.packageJSONTemplate, null, 4), function () {
+                                            var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(err) {
+                                                return regeneratorRuntime.wrap(function _callee$(_context) {
+                                                    while (1) {
+                                                        switch (_context.prev = _context.next) {
+                                                            case 0:
+                                                                console.log(_chalk2.default.green(_i18n2.default.__("Install dependencies ...")));
+
+                                                                prompt([{
+                                                                    type: 'confirm',
+                                                                    name: 'install',
+                                                                    message: _i18n2.default.__("Would you like to install dependencies via NPM?")
+                                                                }]).then(function (result) {
+                                                                    if (result.install) {
+                                                                        var child = (0, _child_process.spawn)("npm install && " + PackageJSON["@dek/scripts"].cliDevMode, {
+                                                                            shell: true,
+                                                                            env: process.env,
+                                                                            cwd: self.settings.path,
+                                                                            stdio: [process.stdin, process.stdout, process.stderr]
+                                                                        });
+
+                                                                        child.on('exit', function (exitCode) {
+                                                                            process.exit(1);
+                                                                        });
+                                                                    } else {
+                                                                        var usageText = "\n    Project created successfully!\n\n    To start the project in development mode:\n    $ cd " + self.settings.path + "\n    $ sudo npm i -g nodemon cross-env babel-cli webpack-cli\n    $ npm install --save-dev\n    $ npm run dev";
+
+                                                                        console.log(usageText);
+                                                                    }
+                                                                });
+
+                                                            case 2:
+                                                            case "end":
+                                                                return _context.stop();
+                                                        }
+                                                    }
+                                                }, _callee, _this);
+                                            }));
+
+                                            return function (_x3) {
+                                                return _ref2.apply(this, arguments);
+                                            };
+                                        }());
+                                    }
+                                }, 1000);
+
+                            case 14:
+                            case "end":
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function bootstrap(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return bootstrap;
+        }()
+    }, {
+        key: "installFrontendFramework",
+        value: function installFrontendFramework(self) {
+            this.installedFrontend = false;
+            console.log(_chalk2.default.green(_i18n2.default.__("Install frontend framework ...")));
+
+            var child = (0, _child_process.spawn)(PackageJSON["@dek/frontend"][self.settings.frontend], {
+                shell: true,
+                env: process.env,
+                cwd: self.settings.path,
+                stdio: [process.stdin, process.stdout, process.stderr]
+            });
+
+            child.on('exit', function (exitCode) {
+                this.installedFrontend = true;
+            });
         }
     }, {
         key: "installDevMode",
         value: function installDevMode(self) {
+            var _this2 = this;
+
+            this.installedDevMode = false;
             console.log(_chalk2.default.green(_i18n2.default.__("Install dev mode ...")));
 
-            (0, _child_process.exec)(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, function (err, stdout, stderr) {
-                process.stdout.write(stdout + '\n');
-                process.stderr.write(stderr + '\n');
-
-                try {
-                    self.addPackageDependencies(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, function (err) {
-                        if (err) console.log(_chalk2.default.red(err));else (0, _plugins.installPlugins)(self.settings);
-                    });
-                } catch (e) {
-                    console.log(_chalk2.default.red(e.message));
-                    (0, _plugins.installPlugins)(self.settings);
-                }
-            });
+            try {
+                this.addPackageDependencies(PackageJSON["@dek/scripts"].devMode, { cwd: self.settings.path }, function () {
+                    _this2.installedDevMode = true;
+                });
+            } catch (e) {
+                console.log(_chalk2.default.red(e.message));
+            }
         }
     }, {
         key: "installWebpack",
         value: function installWebpack(self) {
+            var _this3 = this;
+
+            this.installedWebpack = false;
             console.log(_chalk2.default.green(_i18n2.default.__("Install Webpack ...")));
 
-            self.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, function (err) {
+            return this.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, function () {
                 var WebpackConfigTemplate = require(_path2.default.join(process.cwd(), "templates", "webpack.config.js"))(self);
-                _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate(self));
+                _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate);
+
+                _this3.installedWebpack = true;
+                return true;
             });
         }
     }, {
         key: "addPackageDependencies",
-        value: function addPackageDependencies(scripts, settings, callback) {
-            if (typeof scripts == "string") scripts = [scripts];
+        value: function () {
+            var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(scripts, settings, callback) {
+                var _this4 = this;
 
-            scripts.forEach(function () {});
+                var totalScripts, loadedScripts;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                totalScripts = 0, loadedScripts = 0;
 
-            //var sepScript = script.split("&&");
-            //console.log();
-        }
+
+                                if (typeof scripts == "string") scripts = [scripts];
+
+                                _context3.next = 4;
+                                return _npm2.default.load({}, function (err) {
+                                    scripts.forEach(function (parScript) {
+                                        if (/--save-dev/.test(parScript)) {
+                                            parScript = parScript.replace("--save-dev", "");
+
+                                            parScript.split(" ").forEach(function (dependency) {
+                                                if (dependency && dependency != "") {
+                                                    totalScripts++;
+
+                                                    _npm2.default.commands.show([dependency, 'name'], function (err, rawData) {
+                                                        loadedScripts++;
+                                                        _this4.packageJSONTemplate.devDependencies[dependency] = "^" + Object.keys(rawData)[0];
+                                                    });
+                                                }
+                                            });
+                                        } else {
+                                            parScript = parScript.replace("--save", "");
+
+                                            parScript.split(" ").forEach(function (dependency) {
+                                                if (dependency && dependency != "") {
+                                                    totalScripts++;
+
+                                                    _npm2.default.commands.show([dependency, 'name'], function (err, rawData) {
+                                                        loadedScripts++;
+                                                        _this4.packageJSONTemplate.dependencies[dependency] = "^" + Object.keys(rawData)[0];
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                    if (typeof callback == "function") {
+                                        var pCallback = setInterval(function () {
+                                            if (loadedScripts === totalScripts) {
+                                                callback();
+                                                clearInterval(pCallback);
+                                            }
+                                        }, 1000);
+                                    }
+                                });
+
+                            case 4:
+                            case "end":
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function addPackageDependencies(_x4, _x5, _x6) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return addPackageDependencies;
+        }()
     }, {
         key: "Help",
         value: function Help() {
-            var usageText = "\n      Usage:\n        dek install (with no args, in package dir)\n        dek install <plugin>\n        dek install <git:// url>\n      ";
+            var usageText = "\n  Usage:\n    dek install (with no args, in package dir)\n    dek install <plugin>\n    dek install <git:// url>\n  ";
 
             console.log(usageText);
         }
@@ -123,29 +316,31 @@ var Install = exports.Install = function () {
 }();
 
 exports.default = function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(argv) {
+    var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(argv) {
         var install;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
-                switch (_context.prev = _context.next) {
+                switch (_context4.prev = _context4.next) {
                     case 0:
                         install = new Install();
 
 
-                        if (argv.h) {} else if (argv._.length > 1) {
+                        if (argv.h) {
+                            install.Help();
+                        } else if (argv._.length > 1) {
                             //Install Plugins
                         } else {}
 
                     case 2:
                     case "end":
-                        return _context.stop();
+                        return _context4.stop();
                 }
             }
-        }, _callee, undefined);
+        }, _callee4, undefined);
     }));
 
-    return function (_x) {
-        return _ref.apply(this, arguments);
+    return function (_x7) {
+        return _ref4.apply(this, arguments);
     };
 }();
 //# sourceMappingURL=install.js.map

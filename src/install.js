@@ -11,7 +11,6 @@ import _ from "lodash";
 import gitClone from "git-clone";
 import rimraf from "rimraf";
 import { exec, spawn } from "child_process";
-import { PluginManager } from "live-plugin-manager";
 
 import { installPlugins } from "./plugins";
 
@@ -29,16 +28,17 @@ export class Install{
         else
             this.installedDevMode = true;
 
-        if(self.settings.webpack)
-            await this.installWebpack(self);
-        else
+        if(self.settings.frontend != "none"){
+            await this.installFrontendFramework(self);
             this.installedWebpack = true;
-
-        //if(self.settings.skeleton)
-        //    installPlugins(self, packageJSONTemplate);
+        }
+        else {
+            await this.installWebpack(self);
+            this.installedFrontend = true;
+        }
 
         var installInterval = setInterval(() => {
-            if(this.installedDevMode && this.installedWebpack){
+            if(this.installedDevMode && this.installedWebpack && this.installedFrontend){
                 clearInterval(installInterval);
                 console.log(chalk.green(i18n.__("Create package.json ...")));
 
@@ -51,34 +51,76 @@ export class Install{
                         message: i18n.__("Would you like to install dependencies via NPM?"),
                     }]).then(result => {
                         if(result.install){
-                            exec("npm install", { cwd: self.settings.path }, (err, stdout, stderr) => {
-                                process.stdout.write(stdout + '\n');
-                                process.stderr.write(stderr + '\n');
+                            var child = spawn("npm install -D", {
+                                shell: true,
+                                env: process.env,
+                                cwd: self.settings.path,
+                                stdio: [process.stdin, process.stdout, process.stderr]
+                            });
 
-                                console.log(chalk.green(i18n.__("Install nodemon ...")));
+                            child.on('exit', function (exitCode) {
+                                const usageText = `Project created successfully!
 
-                                exec(PackageJSON["@dek/scripts"].cliDevMode, { cwd: self.settings.path }, (err, stdout, stderr) => {
-                                    process.stdout.write(stdout + '\n');
-                                    process.stderr.write(stderr + '\n');
-                                    return true;
-                                });
+To start the project in development mode:
+$ cd ${self.settings.path}
+$ ${PackageJSON["@dek/scripts"].cliDevMode}
+$ npm run dev
+
+`;
+
+                                console.log(usageText);
                             });
                         }
                         else{
-                            const usageText = `
-    Project created successfully!
+                            const usageText = `Project created successfully!
 
-    To start the project in development mode:
-    cd ${self.settings.path}
-    npm i -g nodemon && npm install
-    npm run dev`;
+To start the project in development mode:
+$ cd ${self.settings.path}
+$ ${PackageJSON["@dek/scripts"].cliDevMode}
+$ npm install --save-dev
+$ npm run dev
 
-                          console.log(usageText);
+`;
+
+                            console.log(usageText);
                         }
                     });
                 });
             }
         }, 1000);
+    }
+
+    installFrontendFramework(self){
+        var __self = this;
+        this.installedFrontend = false;
+        console.log(chalk.green(i18n.__("Install frontend framework ...")));
+
+        if(this.directoryExists(path.join(self.settings.path, "public"))){
+            rimraf(path.join(self.settings.path, "public"), () => {
+                var child = spawn(PackageJSON["@dek/frontend"][self.settings.frontend], {
+                    shell: true,
+                    env: process.env,
+                    cwd: self.settings.path,
+                    stdio: [process.stdin, process.stdout, process.stderr]
+                });
+
+                child.on('exit', function (exitCode) {
+                    __self.installedFrontend = true;
+                });
+            });
+        }
+        else{
+            var child = spawn(PackageJSON["@dek/frontend"][self.settings.frontend], {
+                shell: true,
+                env: process.env,
+                cwd: self.settings.path,
+                stdio: [process.stdin, process.stdout, process.stderr]
+            });
+
+            child.on('exit', function (exitCode) {
+                __self.installedFrontend = true;
+            });
+        }
     }
 
     installDevMode(self){
@@ -154,6 +196,11 @@ export class Install{
                 }, 1000);
             }
         });
+    }
+
+    directoryExists(filePath){
+        try { return fs.statSync(filePath).isDirectory(); }
+        catch (err) { return false; }
     }
 
     Help(){
