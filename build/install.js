@@ -205,8 +205,6 @@ var Install = exports.Install = function () {
 
                     child.on('exit', function (exitCode) {
                         __self.installedFrontend = true;
-
-                        if (self.settings.frontendproxy) __self.installProxy(self);
                     });
                 });
             } else {
@@ -219,8 +217,6 @@ var Install = exports.Install = function () {
 
                 child.on('exit', function (exitCode) {
                     __self.installedFrontend = true;
-
-                    if (self.settings.frontendproxy) __self.installProxy(self);
                 });
             }
         }

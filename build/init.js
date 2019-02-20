@@ -228,7 +228,7 @@ var Init = exports.Init = function () {
             console.log(_chalk2.default.green(_i18n2.default.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
             if (self.settings.skeleton) {
-                (0, _gitClone2.default)(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, function (err) {
+                (0, _gitClone2.default)("git@github.com:dekproject/boostrap.git", self.settings.path, function (err) {
                     if (err) console.log(_chalk2.default.red(err));else {
                         self.unlinkGitAndPackage(self);
                     }

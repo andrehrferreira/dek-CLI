@@ -107,9 +107,6 @@ $ npm run dev
 
                 child.on('exit', function (exitCode) {
                     __self.installedFrontend = true;
-
-                    if(self.settings.frontendproxy)
-                        __self.installProxy(self);
                 });
             });
         }
@@ -123,9 +120,6 @@ $ npm run dev
 
             child.on('exit', function (exitCode) {
                 __self.installedFrontend = true;
-
-                if(self.settings.frontendproxy)
-                    __self.installProxy(self);
             });
         }
     }
