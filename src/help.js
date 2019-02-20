@@ -1,8 +1,7 @@
 import 'babel-polyfill';
 
 export default async () => {
-    const usageText = `
-    Usage:
+    const usageText = `     Usage:
         $ dek <command>
 
         commands can be:

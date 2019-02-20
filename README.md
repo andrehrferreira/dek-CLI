@@ -4,7 +4,6 @@ CLI for Dek
 
 What does the CLI do?
 
-
 * Create a base project
 * Has an optional base skeleton to facilitate the development (https://github.com/dekproject/boostrap)
 * Installs development components (cross-env, mocha, nodemon, babel, etc)
@@ -44,14 +43,15 @@ The CLI will ask you some questions for configuring the **package.json** and **.
 
 ```
 ? What is the name of the project? myproject
+? What is the author's name?
+? What is the project description? Another DEK project
 ? What is the version of the project? 1.0.0
 ? Directory for your project: /media/Dek/CLI/myproject
 ? What is the repository of this project? https://github.com/dekproject/CLI
-? Do you want to use DEK skeleton? Yes
-? Do you want to install components for development mode? Yes
-? Do you want to install Webpack to optimize your frontend? Yes
-? Select plugins for your project: mongoDB, redis
-? Do you want to install some frontend framework?
+? Do you want to use DEK skeleton? [Yes/No]
+? Do you want to install components for development mode? [Yes/No]
+? Do you want to install some frontend framework? [nuxt/angular/react/ember]
+? Select plugins for your project: mongodb, redis, elasticsearch
 ```
 
 ### Install plugins/dependencies
