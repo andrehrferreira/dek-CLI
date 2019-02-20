@@ -1,6 +1,6 @@
 {
     "name": "@dek/cli",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "CLI for Dek",
     "main": "index.js",
     "scripts": {
@@ -33,6 +33,7 @@
     },
     "homepage": "https://github.com/dekproject/CLI",
     "dependencies": {
+        "cross-env": "^5.2.0",
         "chalk": "^2.4.2",
         "clear": "^0.1.0",
         "figlet": "^1.2.1",
@@ -52,7 +53,6 @@
         "babel-preset-env": "^1.7.0",
         "babel-preset-minify": "^0.5.0",
         "babel-preset-react": "^6.24.1",
-        "cross-env": "^5.2.0",
         "mocha": "^5.2.0",
         "nodemon": "^1.18.9"
     },

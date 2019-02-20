@@ -6,12 +6,17 @@ module.exports = (self) => {
         author: self.settings.author,
         main: "src/index.js",
         scripts: {
-            "test": "npm run build && mocha",
             "dev": "nodemon -w src --exec \"babel-node src --presets env\"",
             "build": "babel src -s -D -d build --presets env",
             "start": "npm run build && node build"
         },
-        devDependencies: {},
-        dependencies: {}
+        dependencies: {
+            "dotenv": "^6.2.0",
+            "express": "^4.16.4"
+        },
+        devDependencies: {
+            "babel-cli": "^6.26.0",
+            "babel-preset-env": "^1.7.0"
+        }
     };
 };
