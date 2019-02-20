@@ -8,8 +8,8 @@ What does the CLI do?
 * Has an optional base skeleton to facilitate the development (https://github.com/dekproject/boostrap)
 * Installs development components (cross-env, mocha, nodemon, babel, etc)
 * Configure Webpack and Babel for ES6 (client and server)
-* It has plugins for basic services (mongoDB, redis, authentication, etc)
-* Set up production and development environment for Angular, React and Vue.js
+* It has plugins for basic services (mongodb, redis, authentication, etc)
+* Set up production and development environment for Angular, React and Nuxt
 * Generates configuration file for Docker and Docker-compose
 * Be happy =)
 
@@ -48,7 +48,6 @@ What does the skeleton do?
 * Create a basic HTTP server with Express (https://www.npmjs.com/package/express)
 * Set up the Babel build environment (https://babeljs.io/)
 * Structure in ES6 build by Babel
-* Configures production environment using Docker and Docker-compose
 * Configuration control via dotenv (https://www.npmjs.com/package/dotenv)
 
 For more information access: https://github.com/dekproject/boostrap
@@ -63,7 +62,7 @@ When creating a CLI deployment project, an installation of the Nuxt, Angular or 
 ? What will be the backend path? /api
 ```
 
-Currently each framework has its own peculiarities in relation to the build and mode of development so in this case with the help of the module **concurrently(https://www.npmjs.com/package/concurrently)** will be added two servers, one containing the routes of API with Express, another containing the framework chosen, so that there is no need of later configurations and it is possible to create a proxy between the connections where the route is defined as the default backend "/api" will be of the DEK skeleton and the route "/" will be of the frontend. To create the proxy the system uses the module **express-http-proxy  (https://www.npmjs.com/package/express-http-proxy)**.
+Currently each framework has its own peculiarities in relation to the build and mode of development so in this case with the help of the module **concurrently (https://www.npmjs.com/package/concurrently)** will be added two servers, one containing the routes of API with Express, another containing the framework chosen, so that there is no need of later configurations and it is possible to create a proxy between the connections where the route is defined as the default backend "/api" will be of the DEK skeleton and the route "/" will be of the frontend. To create the proxy the system uses the module **express-http-proxy (https://www.npmjs.com/package/express-http-proxy)**.
 
 To access the development environment using proxy, simply access the following address varying according to the port informed, **default 5555**
 
