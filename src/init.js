@@ -196,7 +196,7 @@ export class Init{
         console.log(chalk.green(i18n.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
         if(self.settings.skeleton){
-            gitClone(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, err => {
+            gitClone("git@github.com:dekproject/boostrap.git", self.settings.path, err => {
                 if(err) console.log(chalk.red(err));
                 else {
                     self.unlinkGitAndPackage(self);
