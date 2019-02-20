@@ -18,7 +18,7 @@ import Install from "./install";
 import New from "./new";
 import Update from "./update";
 
-const CLIPath = path.dirname(fs.realpathSync(__filename));
+const CLIPath = path.resolve(path.dirname(fs.realpathSync(__filename)), "../");
 const PackageJSON = require(path.join(CLIPath, "package"));
 
 let prompt = inquirer.createPromptModule();

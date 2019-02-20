@@ -8,7 +8,7 @@ import inquirer from "inquirer";
 import i18n from "i18n";
 import _ from "lodash";
 
-const CLIPath = path.dirname(fs.realpathSync(__filename));
+const CLIPath = path.resolve(path.dirname(fs.realpathSync(__filename)), "../");
 const PackageJSON = require(path.join(CLIPath, "package"));
 
 let prompt = inquirer.createPromptModule();

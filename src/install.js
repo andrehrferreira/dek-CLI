@@ -14,7 +14,7 @@ import { exec, spawn } from "child_process";
 
 import { installPlugins } from "./plugins";
 
-const CLIPath = path.dirname(fs.realpathSync(__filename));
+const CLIPath = path.resolve(path.dirname(fs.realpathSync(__filename)), "../");
 const PackageJSON = require(path.join(CLIPath, "package"));
 
 let prompt = inquirer.createPromptModule();

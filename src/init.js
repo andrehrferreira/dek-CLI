@@ -15,7 +15,7 @@ import { exec } from "child_process";
 
 import { Install } from "./install";
 
-const CLIPath = path.dirname(fs.realpathSync(__filename));
+const CLIPath = path.resolve(path.dirname(fs.realpathSync(__filename)), "../");
 const PackageJSON = require(path.join(CLIPath, "package"));
 
 let prompt = inquirer.createPromptModule();
