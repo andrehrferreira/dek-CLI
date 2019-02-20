@@ -70,6 +70,7 @@ $ npm run dev
 `;
 
                                 console.log(usageText);
+                                process.exit(0);
                             });
                         }
                         else{
@@ -84,6 +85,7 @@ $ npm run dev
 `;
 
                             console.log(usageText);
+                            process.exit(0);
                         }
                     });
                 });

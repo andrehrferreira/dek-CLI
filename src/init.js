@@ -10,7 +10,7 @@ import i18n from "i18n";
 import _ from "lodash";
 import gitClone from "git-clone";
 import rimraf from "rimraf";
-import { exec } from "child_process";
+import { exec, spawn } from "child_process";
 //import YAML from 'yaml';
 
 import { Install } from "./install";
@@ -196,12 +196,22 @@ export class Init{
         console.log(chalk.green(i18n.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
         if(self.settings.skeleton){
-            gitClone("git@github.com:dekproject/boostrap.git", self.settings.path, err => {
+            var child = spawn(`git clone https://github.com/dekproject/boostrap ${self.settings.path}`, {
+                shell: true,
+                env: process.env,
+                cwd: self.settings.path
+            });
+
+            child.on('exit', function (exitCode) {
+                self.unlinkGitAndPackage(self);
+            });
+
+            /*gitClone("git@github.com:dekproject/boostrap.git", self.settings.path, err => {
                 if(err) console.log(chalk.red(err));
                 else {
                     self.unlinkGitAndPackage(self);
                 }
-            });
+            });*/
         }
         else{
             self.createGitAndPackage(self);

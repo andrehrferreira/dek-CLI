@@ -44,5 +44,6 @@
 	"Please enter a valid port between 1-65535": "Please enter a valid port between 1-65535",
 	"Do you want to create a frontend proxy?": "Do you want to create a frontend proxy?",
 	"What will be the backend path?": "What will be the backend path?",
-	"Error trying to create proxy": "Error trying to create proxy"
+	"Error trying to create proxy": "Error trying to create proxy",
+	"Do you want to use default skeleton?": "Do you want to use default skeleton?"
 }

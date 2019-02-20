@@ -150,11 +150,13 @@ var Install = exports.Install = function () {
                                                                             var usageText = "Project created successfully!\n\nTo start the project in development mode:\n$ cd " + self.settings.path + "\n$ " + PackageJSON["@dek/scripts"].cliDevMode + "\n$ npm run dev\n\n";
 
                                                                             console.log(usageText);
+                                                                            process.exit(0);
                                                                         });
                                                                     } else {
                                                                         var usageText = "Project created successfully!\n\nTo start the project in development mode:\n$ cd " + self.settings.path + "\n$ " + PackageJSON["@dek/scripts"].cliDevMode + "\n$ npm install --save-dev\n$ npm run dev\n\n";
 
                                                                         console.log(usageText);
+                                                                        process.exit(0);
                                                                     }
                                                                 });
 

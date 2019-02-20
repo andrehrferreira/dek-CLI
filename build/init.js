@@ -228,11 +228,22 @@ var Init = exports.Init = function () {
             console.log(_chalk2.default.green(_i18n2.default.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
             if (self.settings.skeleton) {
-                (0, _gitClone2.default)("git@github.com:dekproject/boostrap.git", self.settings.path, function (err) {
-                    if (err) console.log(_chalk2.default.red(err));else {
+                var child = (0, _child_process.spawn)("git clone https://github.com/dekproject/boostrap " + self.settings.path, {
+                    shell: true,
+                    env: process.env,
+                    cwd: self.settings.path
+                });
+
+                child.on('exit', function (exitCode) {
+                    self.unlinkGitAndPackage(self);
+                });
+
+                /*gitClone("git@github.com:dekproject/boostrap.git", self.settings.path, err => {
+                    if(err) console.log(chalk.red(err));
+                    else {
                         self.unlinkGitAndPackage(self);
                     }
-                });
+                });*/
             } else {
                 self.createGitAndPackage(self);
             }
