@@ -18,7 +18,7 @@ What does the CLI do?
 To start using the CLI you will first need to download in NPM using the following command
 
 ```bash
-$ npm i -g @dek/cli
+$ npm i -g @dekproject/cli
 ```
 
 ## Create new project
