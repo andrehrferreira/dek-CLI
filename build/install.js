@@ -59,7 +59,8 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var PackageJSON = require(_path2.default.join(process.cwd(), "package"));
+var CLIPath = _path2.default.resolve(_path2.default.dirname(_fs2.default.realpathSync(__filename)), "../");
+var PackageJSON = require(_path2.default.join(CLIPath, "package"));
 
 var prompt = _inquirer2.default.createPromptModule();
 _inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
@@ -248,7 +249,7 @@ var Install = exports.Install = function () {
             console.log(_chalk2.default.green(_i18n2.default.__("Install Webpack ...")));
 
             this.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, function () {
-                var WebpackConfigTemplate = require(_path2.default.join(process.cwd(), "templates", "webpack.config.js"))(self);
+                var WebpackConfigTemplate = require(_path2.default.join(CLIPath, "templates", "webpack.config.js"))(self);
                 _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate);
 
                 _this3.installedWebpack = true;

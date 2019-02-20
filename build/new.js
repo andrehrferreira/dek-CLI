@@ -40,7 +40,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var PackageJSON = require(_path2.default.join(process.cwd(), "package"));
+var CLIPath = _path2.default.resolve(_path2.default.dirname(_fs2.default.realpathSync(__filename)), "../");
+var PackageJSON = require(_path2.default.join(CLIPath, "package"));
 
 var prompt = _inquirer2.default.createPromptModule();
 _inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
@@ -48,7 +49,7 @@ _inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 _i18n2.default.configure({
     locales: ['en'],
     defaultLocale: 'en',
-    directory: _path2.default.join(process.cwd(), "locales")
+    directory: _path2.default.join(CLIPath, "locales")
 });
 
 var New = function () {

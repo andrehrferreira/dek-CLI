@@ -60,7 +60,8 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var PackageJSON = require(_path2.default.join(process.cwd(), "package"));
+var CLIPath = _path2.default.resolve(_path2.default.dirname(_fs2.default.realpathSync(__filename)), "../");
+var PackageJSON = require(_path2.default.join(CLIPath, "package"));
 
 var prompt = _inquirer2.default.createPromptModule();
 _inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
@@ -68,7 +69,7 @@ _inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 _i18n2.default.configure({
     locales: ['en'],
     defaultLocale: 'en',
-    directory: _path2.default.join(process.cwd(), "locales")
+    directory: _path2.default.join(CLIPath, "locales")
 });
 
 var Init = exports.Init = function () {
@@ -270,7 +271,7 @@ var Init = exports.Init = function () {
                 if (self.settings.backendroute) dotEnvFile += "BACKEND_ALIAS=" + self.settings.backendroute + "\n";
 
                 //Create proxy.js
-                _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "src", "proxy.js"), require(_path2.default.join(process.cwd(), "templates", "proxy.js"))());
+                _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "src", "proxy.js"), require(_path2.default.join(CLIPath, "templates", "proxy.js"))());
             }
 
             _fs2.default.writeFileSync(_path2.default.join(self.settings.path, ".env"), dotEnvFile);
@@ -280,7 +281,7 @@ var Init = exports.Init = function () {
         value: function createGitAndPackage(self) {
             console.log(_chalk2.default.green(_i18n2.default.__("Creating project package.json ...")));
 
-            if (self.settings.frontend) var packageJSONTemplate = require(_path2.default.join(process.cwd(), "templates", "package-with-frontend.json.js"));else var packageJSONTemplate = require(_path2.default.join(process.cwd(), "templates", "package.json.js"));
+            if (self.settings.frontend) var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package-with-frontend.json.js"));else var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package.json.js"));
 
             packageJSONTemplate = packageJSONTemplate(self);
 
