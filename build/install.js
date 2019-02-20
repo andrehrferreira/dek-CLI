@@ -99,7 +99,7 @@ var Install = exports.Install = function () {
 
                             case 7:
                                 if (!(self.settings.frontend != "none")) {
-                                    _context2.next = 12;
+                                    _context2.next = 13;
                                     break;
                                 }
 
@@ -107,16 +107,18 @@ var Install = exports.Install = function () {
                                 return this.installFrontendFramework(self);
 
                             case 10:
-                                _context2.next = 13;
+                                this.installedWebpack = true;
+                                _context2.next = 16;
                                 break;
 
-                            case 12:
+                            case 13:
+                                _context2.next = 15;
+                                return this.installWebpack(self);
+
+                            case 15:
                                 this.installedFrontend = true;
 
-                            case 13:
-                                //if(self.settings.skeleton)
-                                //    installPlugins(self, packageJSONTemplate);
-
+                            case 16:
                                 installInterval = setInterval(function () {
                                     if (_this.installedDevMode && _this.installedWebpack && _this.installedFrontend) {
                                         clearInterval(installInterval);
@@ -136,7 +138,7 @@ var Install = exports.Install = function () {
                                                                     message: _i18n2.default.__("Would you like to install dependencies via NPM?")
                                                                 }]).then(function (result) {
                                                                     if (result.install) {
-                                                                        var child = (0, _child_process.spawn)("npm install && " + PackageJSON["@dek/scripts"].cliDevMode, {
+                                                                        var child = (0, _child_process.spawn)("npm install -D", {
                                                                             shell: true,
                                                                             env: process.env,
                                                                             cwd: self.settings.path,
@@ -144,10 +146,12 @@ var Install = exports.Install = function () {
                                                                         });
 
                                                                         child.on('exit', function (exitCode) {
-                                                                            process.exit(1);
+                                                                            var usageText = "Project created successfully!\n\nTo start the project in development mode:\n$ cd " + self.settings.path + "\n$ " + PackageJSON["@dek/scripts"].cliDevMode + "\n$ npm run dev\n\n";
+
+                                                                            console.log(usageText);
                                                                         });
                                                                     } else {
-                                                                        var usageText = "\n    Project created successfully!\n\n    To start the project in development mode:\n    $ cd " + self.settings.path + "\n    $ sudo npm i -g nodemon cross-env babel-cli webpack-cli\n    $ npm install --save-dev\n    $ npm run dev";
+                                                                        var usageText = "Project created successfully!\n\nTo start the project in development mode:\n$ cd " + self.settings.path + "\n$ " + PackageJSON["@dek/scripts"].cliDevMode + "\n$ npm install --save-dev\n$ npm run dev\n\n";
 
                                                                         console.log(usageText);
                                                                     }
@@ -168,7 +172,7 @@ var Install = exports.Install = function () {
                                     }
                                 }, 1000);
 
-                            case 14:
+                            case 17:
                             case "end":
                                 return _context2.stop();
                         }
@@ -185,19 +189,39 @@ var Install = exports.Install = function () {
     }, {
         key: "installFrontendFramework",
         value: function installFrontendFramework(self) {
+            var __self = this;
             this.installedFrontend = false;
             console.log(_chalk2.default.green(_i18n2.default.__("Install frontend framework ...")));
 
-            var child = (0, _child_process.spawn)(PackageJSON["@dek/frontend"][self.settings.frontend], {
-                shell: true,
-                env: process.env,
-                cwd: self.settings.path,
-                stdio: [process.stdin, process.stdout, process.stderr]
-            });
+            if (this.directoryExists(_path2.default.join(self.settings.path, "public"))) {
+                (0, _rimraf2.default)(_path2.default.join(self.settings.path, "public"), function () {
+                    var child = (0, _child_process.spawn)(PackageJSON["@dek/frontend"][self.settings.frontend], {
+                        shell: true,
+                        env: process.env,
+                        cwd: self.settings.path,
+                        stdio: [process.stdin, process.stdout, process.stderr]
+                    });
 
-            child.on('exit', function (exitCode) {
-                this.installedFrontend = true;
-            });
+                    child.on('exit', function (exitCode) {
+                        __self.installedFrontend = true;
+
+                        if (self.settings.frontendproxy) __self.installProxy(self);
+                    });
+                });
+            } else {
+                var child = (0, _child_process.spawn)(PackageJSON["@dek/frontend"][self.settings.frontend], {
+                    shell: true,
+                    env: process.env,
+                    cwd: self.settings.path,
+                    stdio: [process.stdin, process.stdout, process.stderr]
+                });
+
+                child.on('exit', function (exitCode) {
+                    __self.installedFrontend = true;
+
+                    if (self.settings.frontendproxy) __self.installProxy(self);
+                });
+            }
         }
     }, {
         key: "installDevMode",
@@ -223,7 +247,7 @@ var Install = exports.Install = function () {
             this.installedWebpack = false;
             console.log(_chalk2.default.green(_i18n2.default.__("Install Webpack ...")));
 
-            return this.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, function () {
+            this.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, function () {
                 var WebpackConfigTemplate = require(_path2.default.join(process.cwd(), "templates", "webpack.config.js"))(self);
                 _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate);
 
@@ -247,47 +271,25 @@ var Install = exports.Install = function () {
 
                                 if (typeof scripts == "string") scripts = [scripts];
 
-                                _context3.next = 4;
-                                return _npm2.default.load({}, function (err) {
-                                    scripts.forEach(function (parScript) {
-                                        if (/--save-dev/.test(parScript)) {
-                                            parScript = parScript.replace("--save-dev", "");
+                                scripts.forEach(function (parScript) {
+                                    if (/--save-dev/.test(parScript)) {
+                                        parScript = parScript.replace("--save-dev", "");
 
-                                            parScript.split(" ").forEach(function (dependency) {
-                                                if (dependency && dependency != "") {
-                                                    totalScripts++;
+                                        parScript.split(" ").forEach(function (dependency) {
+                                            if (dependency && dependency != "") _this4.packageJSONTemplate.devDependencies[dependency] = "latest";
+                                        });
+                                    } else {
+                                        parScript = parScript.replace("--save", "");
 
-                                                    _npm2.default.commands.show([dependency, 'name'], function (err, rawData) {
-                                                        loadedScripts++;
-                                                        _this4.packageJSONTemplate.devDependencies[dependency] = "^" + Object.keys(rawData)[0];
-                                                    });
-                                                }
-                                            });
-                                        } else {
-                                            parScript = parScript.replace("--save", "");
-
-                                            parScript.split(" ").forEach(function (dependency) {
-                                                if (dependency && dependency != "") {
-                                                    totalScripts++;
-
-                                                    _npm2.default.commands.show([dependency, 'name'], function (err, rawData) {
-                                                        loadedScripts++;
-                                                        _this4.packageJSONTemplate.dependencies[dependency] = "^" + Object.keys(rawData)[0];
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
-
-                                    if (typeof callback == "function") {
-                                        var pCallback = setInterval(function () {
-                                            if (loadedScripts === totalScripts) {
-                                                callback();
-                                                clearInterval(pCallback);
-                                            }
-                                        }, 1000);
+                                        parScript.split(" ").forEach(function (dependency) {
+                                            if (dependency && dependency != "") _this4.packageJSONTemplate.dependencies[dependency] = "latest";
+                                        });
                                     }
                                 });
+
+                                if (typeof callback == "function") setInterval(function () {
+                                    callback();
+                                }, 1000);
 
                             case 4:
                             case "end":
@@ -303,6 +305,15 @@ var Install = exports.Install = function () {
 
             return addPackageDependencies;
         }()
+    }, {
+        key: "directoryExists",
+        value: function directoryExists(filePath) {
+            try {
+                return _fs2.default.statSync(filePath).isDirectory();
+            } catch (err) {
+                return false;
+            }
+        }
     }, {
         key: "Help",
         value: function Help() {

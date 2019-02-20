@@ -24,7 +24,7 @@ let prompt = inquirer.createPromptModule();
 inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 
 i18n.configure({
-    locales: ['en', 'ptBR'],
+    locales: ['en'],
     defaultLocale: 'en',
     directory: path.join(process.cwd(), "locales")
 });

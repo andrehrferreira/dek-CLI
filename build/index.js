@@ -69,7 +69,7 @@ var prompt = _inquirer2.default.createPromptModule();
 _inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 
 _i18n2.default.configure({
-    locales: ['en', 'ptBR'],
+    locales: ['en'],
     defaultLocale: 'en',
     directory: _path2.default.join(process.cwd(), "locales")
 });

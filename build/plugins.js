@@ -21,7 +21,7 @@ var Plugins = function () {
     _createClass(Plugins, [{
         key: "installPlugins",
         value: function installPlugins() {
-            console.log("install plugins");
+            console.log("not implemented, sorry =(");
         }
     }]);
 

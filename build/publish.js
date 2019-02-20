@@ -22,4 +22,4 @@ exports.default = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(functi
         }
     }, _callee, undefined);
 }));
-//# sourceMappingURL=update.js.map
+//# sourceMappingURL=publish.js.map

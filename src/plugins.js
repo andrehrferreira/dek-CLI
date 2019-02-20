@@ -2,7 +2,7 @@ import 'babel-polyfill';
 
 class Plugins{
     installPlugins(){
-        console.log("install plugins");
+        console.log("not implemented, sorry =(");
     }
 }
 

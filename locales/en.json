@@ -39,5 +39,10 @@
 	"Please set a valid repository url": "Please set a valid repository url",
 	"Creating project .git ...": "Creating project .git ...",
 	"Unlink boostrap /home/andre/Projetos/Dek/CLI/myproject/.git": "Unlink boostrap /home/andre/Projetos/Dek/CLI/myproject/.git",
-	"Install frontend framework ...": "Install frontend framework ..."
+	"Install frontend framework ...": "Install frontend framework ...",
+	"Define which port will be the backend:": "Define which port will be the backend:",
+	"Please enter a valid port between 1-65535": "Please enter a valid port between 1-65535",
+	"Do you want to create a frontend proxy?": "Do you want to create a frontend proxy?",
+	"What will be the backend path?": "What will be the backend path?",
+	"Error trying to create proxy": "Error trying to create proxy"
 }

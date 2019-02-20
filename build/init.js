@@ -66,7 +66,7 @@ var prompt = _inquirer2.default.createPromptModule();
 _inquirer2.default.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 
 _i18n2.default.configure({
-    locales: ['en', 'ptBR'],
+    locales: ['en'],
     defaultLocale: 'en',
     directory: _path2.default.join(process.cwd(), "locales")
 });
@@ -143,7 +143,7 @@ var Init = exports.Init = function () {
                 }, {
                     type: 'confirm',
                     name: 'skeleton',
-                    message: _i18n2.default.__("Do you want to use DEK skeleton?")
+                    message: _i18n2.default.__("Do you want to use default skeleton?")
                 }, {
                     type: 'confirm',
                     name: 'devmode',
@@ -159,14 +159,44 @@ var Init = exports.Init = function () {
                 }]).then(function (projectConfirms) {
                     if (projectConfirms.skeleton) {
                         prompt([{
-                            type: 'checkbox',
-                            name: 'plugins',
-                            message: _i18n2.default.__("Select plugins for your project:"),
-                            choices: Object.keys(PackageJSON["@dek/plugins"])
-                        }]).then(function (projectSettingsPlugins) {
-                            var settings = _lodash2.default.merge(projectSettings, projectConfirms, projectSettingsPlugins);
-                            self.settings = settings;
-                            self.createProject();
+                            type: 'input',
+                            name: 'port',
+                            message: _i18n2.default.__("Define which port will be the backend:"),
+                            default: "5555",
+                            validate: function validate(value) {
+                                try {
+                                    var iValue = parseInt(value);
+
+                                    if (iValue >= 1 && iValue <= 65535) return true;else return _i18n2.default.__("Please enter a valid port between 1-65535");
+                                } catch (e) {
+                                    return _i18n2.default.__("Please enter a valid port between 1-65535");
+                                }
+                            } /*, {
+                                 type: 'checkbox',
+                                 name: 'plugins',
+                                 message: i18n.__("Select plugins for your project:"),
+                                 choices: Object.keys(PackageJSON["@dek/plugins"])
+                              }*/ }]).then(function (projectSettingsPlugins) {
+                            if (projectConfirms.frontend != "none") {
+                                prompt([{
+                                    type: 'confirm',
+                                    name: 'frontendproxy',
+                                    message: _i18n2.default.__("Do you want to create a frontend proxy?")
+                                }, {
+                                    type: 'input',
+                                    name: 'backendroute',
+                                    default: "/api",
+                                    message: _i18n2.default.__("What will be the backend path?")
+                                }]).then(function (projectFrontendSettings) {
+                                    var settings = _lodash2.default.merge(projectSettings, projectConfirms, projectSettingsPlugins, projectFrontendSettings);
+                                    self.settings = settings;
+                                    self.createProject();
+                                });
+                            } else {
+                                var _settings = _lodash2.default.merge(projectSettings, projectConfirms, projectSettingsPlugins);
+                                self.settings = _settings;
+                                self.createProject();
+                            }
                         });
                     } else {
                         settings = _lodash2.default.merge(projectSettings, projectConfirms);
@@ -198,7 +228,7 @@ var Init = exports.Init = function () {
 
             if (self.settings.skeleton) {
                 (0, _gitClone2.default)(PackageJSON.repository.url.replace("CLI", "boostrap"), self.settings.path, function (err) {
-                    if (err) reject(_chalk2.default.red(err));else {
+                    if (err) console.log(_chalk2.default.red(err));else {
                         self.unlinkGitAndPackage(self);
                     }
                 });
@@ -209,8 +239,6 @@ var Init = exports.Init = function () {
     }, {
         key: "unlinkGitAndPackage",
         value: function unlinkGitAndPackage(self) {
-            //fs.writeFileSync(path.join(self.settings.path, "dek.yaml"), YAML.stringify(self.settings));
-
             try {
                 console.log(_chalk2.default.green(_i18n2.default.__("Unlink boostrap package.json")));
                 _fs2.default.unlinkSync(_path2.default.join(self.settings.path, "package.json"));
@@ -218,16 +246,42 @@ var Init = exports.Init = function () {
 
             console.log(_chalk2.default.green(_i18n2.default.__("Unlink boostrap " + _path2.default.join(self.settings.path, ".git"))));
 
+            //Remove .git
             (0, _rimraf2.default)(_path2.default.join(self.settings.path, ".git"), function () {
                 self.createGitAndPackage(self);
             });
+
+            //Create .env
+            var dotEnvFile = "PORT=" + self.settings.port + "\n";
+
+            if (self.settings.frontend != "none" && self.settings.frontendproxy) {
+                switch (self.settings.frontend) {
+                    case "nuxt":
+                    case "react":
+                        dotEnvFile += "PROXY_URL=http://localhost:3000\n";
+                        break;
+                    case "angular":
+                        dotEnvFile += "PROXY_URL=http://localhost:4200\n";break;
+                    default:
+                        console.log(_chalk2.default.red(_i18n2.default.__("Error trying to create proxy")));
+                        break;
+                }
+
+                if (self.settings.backendroute) dotEnvFile += "BACKEND_ALIAS=" + self.settings.backendroute + "\n";
+
+                //Create proxy.js
+                _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "src", "proxy.js"), require(_path2.default.join(process.cwd(), "templates", "proxy.js"))());
+            }
+
+            _fs2.default.writeFileSync(_path2.default.join(self.settings.path, ".env"), dotEnvFile);
         }
     }, {
         key: "createGitAndPackage",
         value: function createGitAndPackage(self) {
             console.log(_chalk2.default.green(_i18n2.default.__("Creating project package.json ...")));
 
-            var packageJSONTemplate = require(_path2.default.join(process.cwd(), "templates", "package.json.js"));
+            if (self.settings.frontend) var packageJSONTemplate = require(_path2.default.join(process.cwd(), "templates", "package-with-frontend.json.js"));else var packageJSONTemplate = require(_path2.default.join(process.cwd(), "templates", "package.json.js"));
+
             packageJSONTemplate = packageJSONTemplate(self);
 
             if (self.settings.repository != "") {
@@ -241,11 +295,6 @@ var Init = exports.Init = function () {
                 packageJSONTemplate.bugs = {
                     "url": self.settings.repository + "/issues"
                 };
-            }
-
-            if (this.settings.webpack) {
-                //packageJSONTemplate.scripts.dev += " && webpack-dev-server --host 0.0.0.0 --port 5555"
-                //packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
             }
 
             if (self.settings.repository != "") {

@@ -14,18 +14,18 @@ let prompt = inquirer.createPromptModule();
 inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 
 i18n.configure({
-    locales: ['en', 'ptBR'],
+    locales: ['en'],
     defaultLocale: 'en',
     directory: path.join(process.cwd(), "locales")
 });
 
 class New {
     Plugin(){
-        console.log("new plugin");
+        console.log("not implemented, sorry =(");
     }
 
     Controller(){
-        console.log("new controller");
+        console.log("not implemented, sorry =(");
     }
 }
 

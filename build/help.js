@@ -14,7 +14,7 @@ exports.default = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(functi
         while (1) {
             switch (_context.prev = _context.next) {
                 case 0:
-                    usageText = '\n    Usage:\n        $ dek <command>\n\n        commands can be:\n\n        init:       used to create a new project\n        install:    used to install plugins/dependencies\n        update:     used to update plugins/dependencies\n        new:        used to create new plugin or controller\n        help:       used to print the usage guide\n\n        dek <command> -h quick help on <command>\n\n    Examples:\n        $ dek init\n        $ dek install mongodb redis\n        $ dek new plugin\n  ';
+                    usageText = '     Usage:\n        $ dek <command>\n\n        commands can be:\n\n        init:       used to create a new project\n        install:    used to install plugins/dependencies\n        update:     used to update plugins/dependencies\n        new:        used to create new plugin or controller\n        help:       used to print the usage guide\n\n        dek <command> -h quick help on <command>\n\n    Examples:\n        $ dek init\n        $ dek install mongodb redis\n        $ dek new plugin\n  ';
 
 
                     console.log(usageText);

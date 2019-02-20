@@ -21,7 +21,7 @@ let prompt = inquirer.createPromptModule();
 inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 
 i18n.configure({
-    locales: ['en', 'ptBR'],
+    locales: ['en'],
     defaultLocale: 'en',
     directory: path.join(process.cwd(), "locales")
 });
@@ -103,7 +103,7 @@ export class Init{
             }, {
                 type: 'confirm',
                 name: 'skeleton',
-                message: i18n.__("Do you want to use DEK skeleton?"),
+                message: i18n.__("Do you want to use default skeleton?"),
             }, {
                 type: 'confirm',
                 name: 'devmode',
@@ -120,14 +120,50 @@ export class Init{
             }]).then(projectConfirms => {
                 if(projectConfirms.skeleton){
                     prompt([{
-                            type: 'checkbox',
-                            name: 'plugins',
-                            message: i18n.__("Select plugins for your project:"),
-                            choices: Object.keys(PackageJSON["@dek/plugins"])
-                    }]).then(projectSettingsPlugins => {
-                        let settings = _.merge(projectSettings, projectConfirms, projectSettingsPlugins);
-                        self.settings = settings;
-                        self.createProject();
+                        type: 'input',
+                        name: 'port',
+                        message: i18n.__("Define which port will be the backend:"),
+                        default: "5555",
+                        validate: (value) => {
+                            try{
+                                var iValue = parseInt(value);
+
+                                if(iValue >= 1 && iValue <= 65535)
+                                    return true;
+                                else
+                                    return i18n.__("Please enter a valid port between 1-65535");
+                            }
+                            catch(e){
+                                return i18n.__("Please enter a valid port between 1-65535");
+                            }
+                        }
+                    }/*, {
+                        type: 'checkbox',
+                        name: 'plugins',
+                        message: i18n.__("Select plugins for your project:"),
+                        choices: Object.keys(PackageJSON["@dek/plugins"])
+                    }*/]).then(projectSettingsPlugins => {
+                        if(projectConfirms.frontend != "none"){
+                            prompt([{
+                                type: 'confirm',
+                                name: 'frontendproxy',
+                                message: i18n.__("Do you want to create a frontend proxy?"),
+                            }, {
+                                type: 'input',
+                                name: 'backendroute',
+                                default: "/api",
+                                message: i18n.__("What will be the backend path?"),
+                            }]).then(projectFrontendSettings => {
+                                let settings = _.merge(projectSettings, projectConfirms, projectSettingsPlugins, projectFrontendSettings);
+                                self.settings = settings;
+                                self.createProject();
+                            });
+                        }
+                        else{
+                            let settings = _.merge(projectSettings, projectConfirms, projectSettingsPlugins);
+                            self.settings = settings;
+                            self.createProject();
+                        }
                     });
                 }
                 else{
@@ -172,8 +208,6 @@ export class Init{
     }
 
     unlinkGitAndPackage(self){
-        //fs.writeFileSync(path.join(self.settings.path, "dek.yaml"), YAML.stringify(self.settings));
-
         try{
             console.log(chalk.green(i18n.__("Unlink boostrap package.json")));
             fs.unlinkSync(path.join(self.settings.path, "package.json"));
@@ -181,15 +215,44 @@ export class Init{
 
         console.log(chalk.green(i18n.__("Unlink boostrap " + path.join(self.settings.path, ".git"))));
 
+        //Remove .git
         rimraf(path.join(self.settings.path, ".git"), () => {
             self.createGitAndPackage(self);
         });
+
+        //Create .env
+        var dotEnvFile = `PORT=${self.settings.port}\n`;
+
+        if(self.settings.frontend != "none" && self.settings.frontendproxy){
+            switch (self.settings.frontend) {
+                case "nuxt":
+                case "react":
+                    dotEnvFile += "PROXY_URL=http://localhost:3000\n";
+                break;
+                case "angular": dotEnvFile += "PROXY_URL=http://localhost:4200\n"; break;
+                default:
+                    console.log(chalk.red(i18n.__("Error trying to create proxy")));
+                break;
+            }
+
+            if(self.settings.backendroute)
+                dotEnvFile += `BACKEND_ALIAS=${self.settings.backendroute}\n`;
+
+            //Create proxy.js
+            fs.writeFileSync(path.join(self.settings.path, "src", "proxy.js"), require(path.join(process.cwd(), "templates", "proxy.js"))());
+        }
+
+        fs.writeFileSync(path.join(self.settings.path, ".env"), dotEnvFile);
     }
 
     createGitAndPackage(self){
         console.log(chalk.green(i18n.__("Creating project package.json ...")));
 
-        var packageJSONTemplate = require(path.join(process.cwd(), "templates", "package.json.js"));
+        if(self.settings.frontend)
+            var packageJSONTemplate = require(path.join(process.cwd(), "templates", "package-with-frontend.json.js"));
+        else
+            var packageJSONTemplate = require(path.join(process.cwd(), "templates", "package.json.js"));
+
         packageJSONTemplate = packageJSONTemplate(self);
 
         if(self.settings.repository != ""){
@@ -203,11 +266,6 @@ export class Init{
             packageJSONTemplate.bugs = {
                 "url": self.settings.repository + "/issues"
             }
-        }
-
-        if(this.settings.webpack){
-            //packageJSONTemplate.scripts.dev += " && webpack-dev-server --host 0.0.0.0 --port 5555"
-            //packageJSONTemplate.scripts.build += " && cross-env NODE_ENV=production webpack --config webpack.config.js";
         }
 
         if(self.settings.repository != ""){

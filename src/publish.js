@@ -1,5 +1,5 @@
 import 'babel-polyfill';
 
 export default async () => {
-    console.log("publish")
+    console.log("not implemented, sorry =(");
 }

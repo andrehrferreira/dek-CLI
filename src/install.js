@@ -106,6 +106,9 @@ $ npm run dev
 
                 child.on('exit', function (exitCode) {
                     __self.installedFrontend = true;
+
+                    if(self.settings.frontendproxy)
+                        __self.installProxy(self);
                 });
             });
         }
@@ -119,6 +122,9 @@ $ npm run dev
 
             child.on('exit', function (exitCode) {
                 __self.installedFrontend = true;
+
+                if(self.settings.frontendproxy)
+                    __self.installProxy(self);
             });
         }
     }
@@ -140,7 +146,7 @@ $ npm run dev
         this.installedWebpack = false;
         console.log(chalk.green(i18n.__("Install Webpack ...")));
 
-        return this.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, () => {
+        this.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, () => {
             var WebpackConfigTemplate = require(path.join(process.cwd(), "templates", "webpack.config.js"))(self);
             fs.writeFileSync(path.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate);
 
@@ -155,47 +161,27 @@ $ npm run dev
         if(typeof scripts == "string")
             scripts = [scripts];
 
-        await npm.load({}, (err) => {
-            scripts.forEach((parScript) => {
-                if(/--save-dev/.test(parScript)){
-                    parScript = parScript.replace("--save-dev", "");
+        scripts.forEach((parScript) => {
+            if(/--save-dev/.test(parScript)){
+                parScript = parScript.replace("--save-dev", "");
 
-                    parScript.split(" ").forEach((dependency) => {
-                        if(dependency && dependency != ""){
-                            totalScripts++;
+                parScript.split(" ").forEach((dependency) => {
+                    if(dependency && dependency != "")
+                        this.packageJSONTemplate.devDependencies[dependency] = "latest";
+                });
+            }
+            else {
+                parScript = parScript.replace("--save", "");
 
-                            npm.commands.show([dependency, 'name'], (err, rawData) => {
-                                loadedScripts++;
-                                this.packageJSONTemplate.devDependencies[dependency] = "^" + Object.keys(rawData)[0];
-                            });
-                        }
-                    });
-                }
-                else {
-                    parScript = parScript.replace("--save", "");
-
-                    parScript.split(" ").forEach((dependency) => {
-                        if(dependency && dependency != ""){
-                            totalScripts++;
-
-                            npm.commands.show([dependency, 'name'], (err, rawData) => {
-                                loadedScripts++;
-                                this.packageJSONTemplate.dependencies[dependency] = "^" + Object.keys(rawData)[0];
-                            });
-                        }
-                    });
-                }
-            });
-
-            if(typeof callback == "function"){
-                var pCallback = setInterval(() => {
-                    if(loadedScripts === totalScripts){
-                        callback();
-                        clearInterval(pCallback);
-                    }
-                }, 1000);
+                parScript.split(" ").forEach((dependency) => {
+                    if(dependency && dependency != "")
+                        this.packageJSONTemplate.dependencies[dependency] = "latest";
+                });
             }
         });
+
+        if(typeof callback == "function")
+            setInterval(() => { callback(); }, 1000);
     }
 
     directoryExists(filePath){

@@ -1,5 +1,4 @@
 var init = require("src/init");
-
 var assert = require('assert');
 
 describe('Create Project', function() {
