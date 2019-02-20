@@ -14,7 +14,8 @@ import { exec, spawn } from "child_process";
 
 import { installPlugins } from "./plugins";
 
-const PackageJSON = require(path.join(process.cwd(), "package"));
+const CLIPath = path.dirname(fs.realpathSync(__filename));
+const PackageJSON = require(path.join(CLIPath, "package"));
 
 let prompt = inquirer.createPromptModule();
 inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
@@ -147,7 +148,7 @@ $ npm run dev
         console.log(chalk.green(i18n.__("Install Webpack ...")));
 
         this.addPackageDependencies([PackageJSON["@dek/scripts"].webpack, PackageJSON["@dek/scripts"].webpackLoaders], { cwd: self.settings.path }, () => {
-            var WebpackConfigTemplate = require(path.join(process.cwd(), "templates", "webpack.config.js"))(self);
+            var WebpackConfigTemplate = require(path.join(CLIPath, "templates", "webpack.config.js"))(self);
             fs.writeFileSync(path.join(self.settings.path, "webpack.config.js"), WebpackConfigTemplate);
 
             this.installedWebpack = true;

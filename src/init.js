@@ -15,7 +15,8 @@ import { exec } from "child_process";
 
 import { Install } from "./install";
 
-const PackageJSON = require(path.join(process.cwd(), "package"));
+const CLIPath = path.dirname(fs.realpathSync(__filename));
+const PackageJSON = require(path.join(CLIPath, "package"));
 
 let prompt = inquirer.createPromptModule();
 inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
@@ -23,7 +24,7 @@ inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 i18n.configure({
     locales: ['en'],
     defaultLocale: 'en',
-    directory: path.join(process.cwd(), "locales")
+    directory: path.join(CLIPath, "locales")
 });
 
 export class Init{
@@ -239,7 +240,7 @@ export class Init{
                 dotEnvFile += `BACKEND_ALIAS=${self.settings.backendroute}\n`;
 
             //Create proxy.js
-            fs.writeFileSync(path.join(self.settings.path, "src", "proxy.js"), require(path.join(process.cwd(), "templates", "proxy.js"))());
+            fs.writeFileSync(path.join(self.settings.path, "src", "proxy.js"), require(path.join(CLIPath, "templates", "proxy.js"))());
         }
 
         fs.writeFileSync(path.join(self.settings.path, ".env"), dotEnvFile);
@@ -249,9 +250,9 @@ export class Init{
         console.log(chalk.green(i18n.__("Creating project package.json ...")));
 
         if(self.settings.frontend)
-            var packageJSONTemplate = require(path.join(process.cwd(), "templates", "package-with-frontend.json.js"));
+            var packageJSONTemplate = require(path.join(CLIPath, "templates", "package-with-frontend.json.js"));
         else
-            var packageJSONTemplate = require(path.join(process.cwd(), "templates", "package.json.js"));
+            var packageJSONTemplate = require(path.join(CLIPath, "templates", "package.json.js"));
 
         packageJSONTemplate = packageJSONTemplate(self);
 

@@ -8,7 +8,8 @@ import inquirer from "inquirer";
 import i18n from "i18n";
 import _ from "lodash";
 
-const PackageJSON = require(path.join(process.cwd(), "package"));
+const CLIPath = path.dirname(fs.realpathSync(__filename));
+const PackageJSON = require(path.join(CLIPath, "package"));
 
 let prompt = inquirer.createPromptModule();
 inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
@@ -16,7 +17,7 @@ inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 i18n.configure({
     locales: ['en'],
     defaultLocale: 'en',
-    directory: path.join(process.cwd(), "locales")
+    directory: path.join(CLIPath, "locales")
 });
 
 class New {
