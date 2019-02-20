@@ -1,5 +1,5 @@
 {
-    "name": "@dek/cli",
+    "name": "@dekproject/cli",
     "version": "1.1.0",
     "description": "CLI for Dek",
     "main": "index.js",
