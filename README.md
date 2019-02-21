@@ -1,4 +1,4 @@
-# @dek/CLI
+# @dekproject/CLI
 
 CLI for Dek
 
