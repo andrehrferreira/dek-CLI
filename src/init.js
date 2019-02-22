@@ -259,7 +259,7 @@ export class Init{
     createGitAndPackage(self){
         console.log(chalk.green(i18n.__("Creating project package.json ...")));
 
-        if(self.settings.frontend)
+        if(self.settings.frontend && self.settings.frontend != "none")
             var packageJSONTemplate = require(path.join(CLIPath, "templates", "package-with-frontend.json.js"));
         else
             var packageJSONTemplate = require(path.join(CLIPath, "templates", "package.json.js"));
