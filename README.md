@@ -89,7 +89,7 @@ $ npm run dev
 If your error in the following error: Internal watch failed: ENOSPC
 
 ```bash
-sudo sysctl fs.inotify.max_user_watches=582222 && sudo sysctl -p
+$ sudo sysctl fs.inotify.max_user_watches=582222 && sudo sysctl -p
 ```
 
 ### Build
