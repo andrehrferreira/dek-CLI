@@ -6,9 +6,9 @@ module.exports = (self) => {
         author: self.settings.author,
         main: "src/index.js",
         scripts: {
-            "dev": "concurrently \"nodemon -w src --exec 'babel-node src --presets env'\" \"cd ./public && npm run dev \"",
-            "build": "concurrently \"babel src -s -D -d build --presets env\" \"cd ./public && npm run build\"",
-            "start": "concurrently \"node build\" \"cd ./public && npm start\""
+            "dev": "concurrently -c \"yellow.bold,green.bold\" -n \"SERVER,BUILD\" \"nodemon -w src --exec 'babel-node src --presets env'\" \"cd ./public && npm run dev \"",
+            "build": "concurrently -c \"yellow.bold,green.bold\" -n \"SERVER,BUILD\" \"babel src -s -D -d build --presets env\" \"cd ./public && npm run build\"",
+            "start": "concurrently -c \"yellow.bold,green.bold\" -n \"SERVER,BUILD\" \"node build\" \"cd ./public && npm start\""
         },
         dependencies: {
             "dotenv": "^6.2.0",

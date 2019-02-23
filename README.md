@@ -77,7 +77,45 @@ We recommend that this configuration in production be done through Nginx or any 
 $ dek publish
 ```
 
-### Help
+### Dev mode
+
+To start the project in development mode just enter the following commands:
+
+```bash
+$ cd myproject
+$ npm run dev
+```
+
+If your error in the following error: Internal watch failed: ENOSPC
+
+```bash
+sudo sysctl fs.inotify.max_user_watches=582222 && sudo sysctl -p
+```
+
+### Build
+
+To build both the server and the frontend files, simply enter the following command
+
+```bash
+$ npm run build
+```
+
+### Production
+
+We recommend that for production be configured using the DEK **publish** function, but if you want to perform all configuration manually, just use the following commands:
+
+```bash
+$ docker-compose build
+$ docker-compose up -d
+```
+
+or
+
+```bash
+$ npm start
+```
+
+## Help
 
 ```bash
 $ dek [help/h/?]
