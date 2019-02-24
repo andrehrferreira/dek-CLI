@@ -36,6 +36,8 @@ var _lodash = require("lodash");
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _plugins = require("./plugins");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -60,7 +62,7 @@ var New = function () {
     _createClass(New, [{
         key: "Plugin",
         value: function Plugin() {
-            console.log("not implemented, sorry =(");
+            _plugins.plugins.new();
         }
     }, {
         key: "Controller",

@@ -8,6 +8,8 @@ import inquirer from "inquirer";
 import i18n from "i18n";
 import _ from "lodash";
 
+import { plugins } from "./plugins";
+
 const CLIPath = path.resolve(path.dirname(fs.realpathSync(__filename)), "../");
 const PackageJSON = require(path.join(CLIPath, "package"));
 
@@ -21,9 +23,7 @@ i18n.configure({
 });
 
 class New {
-    Plugin(){
-        console.log("not implemented, sorry =(");
-    }
+    Plugin(){ plugins.new(); }
 
     Controller(){
         console.log("not implemented, sorry =(");

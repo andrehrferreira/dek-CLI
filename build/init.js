@@ -172,12 +172,13 @@ var Init = exports.Init = function () {
                                 } catch (e) {
                                     return _i18n2.default.__("Please enter a valid port between 1-65535");
                                 }
-                            } /*, {
-                                 type: 'checkbox',
-                                 name: 'plugins',
-                                 message: i18n.__("Select plugins for your project:"),
-                                 choices: Object.keys(PackageJSON["@dek/plugins"])
-                              }*/ }]).then(function (projectSettingsPlugins) {
+                            }
+                        }, {
+                            type: 'checkbox',
+                            name: 'plugins',
+                            message: _i18n2.default.__("Select plugins for your project:"),
+                            choices: Object.keys(PackageJSON["@dek/plugins"])
+                        }]).then(function (projectSettingsPlugins) {
                             if (projectConfirms.frontend != "none") {
                                 prompt([{
                                     type: 'confirm',
@@ -292,7 +293,7 @@ var Init = exports.Init = function () {
         value: function createGitAndPackage(self) {
             console.log(_chalk2.default.green(_i18n2.default.__("Creating project package.json ...")));
 
-            if (self.settings.frontend) var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package-with-frontend.json.js"));else var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package.json.js"));
+            if (self.settings.frontend && self.settings.frontend != "none") var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package-with-frontend.json.js"));else var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package.json.js"));
 
             packageJSONTemplate = packageJSONTemplate(self);
 

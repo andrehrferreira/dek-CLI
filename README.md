@@ -115,6 +115,24 @@ or
 $ npm start
 ```
 
+## Plugins
+
+### Instalation
+
+To install plugins manually use the command:
+
+```bash
+$ dek install mongodb redis
+```
+
+### New Plugin
+
+To create a new plugin run the following command:
+
+```bash
+$ dek new plugin
+```
+
 ## Help
 
 ```bash

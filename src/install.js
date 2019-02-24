@@ -12,7 +12,7 @@ import gitClone from "git-clone";
 import rimraf from "rimraf";
 import { exec, spawn } from "child_process";
 
-import { installPlugins } from "./plugins";
+import { plugins, installPlugin } from "./plugins";
 
 const CLIPath = path.resolve(path.dirname(fs.realpathSync(__filename)), "../");
 const PackageJSON = require(path.join(CLIPath, "package"));
@@ -22,6 +22,7 @@ inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
 
 export class Install{
     async bootstrap(self, packageJSONTemplate){
+        var __this = this;
         this.packageJSONTemplate = packageJSONTemplate;
 
         if(self.settings.devmode)
@@ -38,59 +39,70 @@ export class Install{
             this.installedFrontend = true;
         }
 
-        var installInterval = setInterval(() => {
+        var installInterval = setInterval(async () => {
             if(this.installedDevMode && this.installedWebpack && this.installedFrontend){
                 clearInterval(installInterval);
                 console.log(chalk.green(i18n.__("Create package.json ...")));
 
-                fs.writeFile(path.join(self.settings.path, "package.json"), JSON.stringify(this.packageJSONTemplate, null, 4), async (err) => {
-                    console.log(chalk.green(i18n.__("Install dependencies ...")));
+                if(self.settings.plugins.length > 0){
+                    await plugins.installPlugins(self.settings.plugins, path.join(self.settings.path, "src", "plugins"));
+                    plugins.loadPackageDependencies(path.join(self.settings.path, "src", "plugins")).then((dependencies) => {
+                        __this.addPackageDependencies(dependencies , self.settings, () => {
+                            console.log(chalk.green(i18n.__("Install plugins dependencies ...")));
+                            __this.installDependencies(self);
+                        });
+                    });
+                }
+                else{
+                    this.installDependencies(self);
+                }
+            }
+        }, 1000);
+    }
 
-                    prompt([{
-                        type: 'confirm',
-                        name: 'install',
-                        message: i18n.__("Would you like to install dependencies via NPM?"),
-                    }]).then(result => {
-                        if(result.install){
-                            var child = spawn("npm install -D", {
-                                shell: true,
-                                env: process.env,
-                                cwd: self.settings.path,
-                                stdio: [process.stdin, process.stdout, process.stderr]
-                            });
+    installDependencies(self){
+        fs.writeFile(path.join(self.settings.path, "package.json"), JSON.stringify(this.packageJSONTemplate, null, 4), async (err) => {
+            prompt([{
+                type: 'confirm',
+                name: 'install',
+                message: i18n.__("Would you like to install dependencies via NPM?"),
+            }]).then(result => {
+                if(result.install){
+                    var child = spawn("npm install -D", {
+                        shell: true,
+                        env: process.env,
+                        cwd: self.settings.path,
+                        stdio: [process.stdin, process.stdout, process.stderr]
+                    });
 
-                            child.on('exit', function (exitCode) {
-                                const usageText = `Project created successfully!
+                    child.on('exit', function (exitCode) {
+                        const usageText = `Project created successfully!
 
 To start the project in development mode:
-$ cd ${self.settings.path}
+$ cd .${self.settings.path.replace(process.cwd(), "")}
 $ ${PackageJSON["@dek/scripts"].cliDevMode}
 $ npm run dev
-
 `;
 
-                                console.log(usageText);
-                                process.exit(0);
-                            });
-                        }
-                        else{
-                            const usageText = `Project created successfully!
+                        console.log(usageText);
+                        process.exit(0);
+                    });
+                }
+                else{
+                    const usageText = `Project created successfully!
 
 To start the project in development mode:
-$ cd ${self.settings.path}
+$ cd .${self.settings.path.replace(process.cwd(), "")}
 $ ${PackageJSON["@dek/scripts"].cliDevMode}
 $ npm install --save-dev
 $ npm run dev
-
 `;
 
-                            console.log(usageText);
-                            process.exit(0);
-                        }
-                    });
-                });
-            }
-        }, 1000);
+                    console.log(usageText);
+                    process.exit(0);
+                }
+            });
+        });
     }
 
     installFrontendFramework(self){
@@ -178,7 +190,7 @@ $ npm run dev
         });
 
         if(typeof callback == "function")
-            setInterval(() => { callback(); }, 1000);
+            setTimeout(() => { callback(); }, 1000);
     }
 
     directoryExists(filePath){
@@ -205,9 +217,12 @@ export default async (argv) => {
         install.Help();
     }
     else if(argv._.length > 1){
-        //Install Plugins
+        argv._.forEach(async (pluginName, index) => {
+            if(index != 0)
+                await installPlugin(pluginName);
+        });
     }
     else{
-
+        install.Help();
     }
 }

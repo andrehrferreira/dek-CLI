@@ -138,12 +138,12 @@ export class Init{
                                 return i18n.__("Please enter a valid port between 1-65535");
                             }
                         }
-                    }/*, {
+                    }, {
                         type: 'checkbox',
                         name: 'plugins',
                         message: i18n.__("Select plugins for your project:"),
                         choices: Object.keys(PackageJSON["@dek/plugins"])
-                    }*/]).then(projectSettingsPlugins => {
+                    }]).then(projectSettingsPlugins => {
                         if(projectConfirms.frontend != "none"){
                             prompt([{
                                 type: 'confirm',

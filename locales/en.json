@@ -45,5 +45,8 @@
 	"Do you want to create a frontend proxy?": "Do you want to create a frontend proxy?",
 	"What will be the backend path?": "What will be the backend path?",
 	"Error trying to create proxy": "Error trying to create proxy",
-	"Do you want to use default skeleton?": "Do you want to use default skeleton?"
+	"Do you want to use default skeleton?": "Do you want to use default skeleton?",
+	"Install plugins dependencies ...": "Install plugins dependencies ...",
+	"myplugin": "myplugin",
+	"What is the name of the plugin?": "What is the name of the plugin?"
 }
