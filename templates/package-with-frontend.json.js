@@ -11,6 +11,8 @@ module.exports = (self) => {
             "start": "concurrently -c \"yellow.bold,green.bold\" -n \"SERVER,BUILD\" \"node build\" \"cd ./public && npm start\""
         },
         dependencies: {
+            "@dekproject/routes": "latest",
+            "@dekproject/scope": "latest",
             "dotenv": "^6.2.0",
             "express": "^4.16.4",
             "concurrently": "^4.1.0",

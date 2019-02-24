@@ -11,6 +11,8 @@ module.exports = (self) => {
             "start": "node build"
         },
         dependencies: {
+            "@dekproject/routes": "latest",
+            "@dekproject/scope": "latest",
             "dotenv": "^6.2.0",
             "express": "^4.16.4"
         },
