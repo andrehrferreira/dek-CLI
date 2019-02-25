@@ -22,8 +22,8 @@ i18n.configure({
 
 class Plugins{
     async installPlugins(plugins, pathName){
-        await plugins.forEach(async (pluginName) => {
-            await this.installPlugin(pluginName, pathName);
+        await plugins.forEach((pluginName) => {
+            this.installPlugin(pluginName, pathName);
         });
     }
 
@@ -62,25 +62,30 @@ class Plugins{
         });
     }
 
-    loadPackageDependencies(pathName){
+    loadPackageDependencies(pathName, pluginList){
         return new Promise((resolve, reject) => {
             if(pathName)
                 var pluginPathResolve = path.resolve(pathName);
             else
                 var pluginPathResolve = path.resolve(path.join(process.cwd(), "src", "plugins"));
 
-            setTimeout(() => {
-                globby([`${pluginPathResolve}/*/package.json`]).then((paths) => {
-                    var dependenciesArr = [];
+            var pInterval = setInterval(() => {
+                globby([`${pluginPathResolve}/*/package.json`]).then(async (paths) => {
+                    if(paths.length == pluginList.length){
+                        clearInterval(pInterval);
+                        var dependenciesArr = [];
 
-                    paths.forEach((pluginPackagePath) => {
-                        var pluginPackageRequest = require(pluginPackagePath);
-                        dependenciesArr = _.merge(dependenciesArr, Object.keys(pluginPackageRequest.dependencies));
-                    });
+                        await paths.forEach(async (pluginPackagePath) => {
+                            let pluginPackageRequest = await require(pluginPackagePath);
+                            dependenciesArr = _.concat(dependenciesArr, Object.keys(pluginPackageRequest.dependencies));
+                        });
 
-                    resolve(dependenciesArr.join(" "));
+                        setTimeout(() => {
+                            resolve(dependenciesArr.join(" "));
+                        }, 1000);
+                    }
                 });
-            }, 3000);
+            }, 1000);
         });
     }
 

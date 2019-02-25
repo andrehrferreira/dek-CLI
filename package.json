@@ -1,6 +1,6 @@
 {
     "name": "@dekproject/cli",
-    "version": "1.2.0",
+    "version": "1.2.2",
     "description": "CLI for Dek",
     "main": "index.js",
     "scripts": {
@@ -59,7 +59,8 @@
         "nodemon": "^1.18.9"
     },
     "@dek/plugins": {
-        "mongodb": "dekproject/mongodb"
+        "mongodb": "dekproject/mongodb",
+        "redis": "dekproject/redis"
     },
     "@dek/scripts": {
         "cliDevMode": "sudo npm i -g nodemon cross-env webpack-cli babel-cli",

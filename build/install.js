@@ -145,7 +145,7 @@ var Install = exports.Install = function () {
                                                     return _plugins.plugins.installPlugins(self.settings.plugins, _path2.default.join(self.settings.path, "src", "plugins"));
 
                                                 case 6:
-                                                    _plugins.plugins.loadPackageDependencies(_path2.default.join(self.settings.path, "src", "plugins")).then(function (dependencies) {
+                                                    _plugins.plugins.loadPackageDependencies(_path2.default.join(self.settings.path, "src", "plugins"), self.settings.plugins).then(function (dependencies) {
                                                         __this.addPackageDependencies(dependencies, self.settings, function () {
                                                             console.log(_chalk2.default.green(_i18n2.default.__("Install plugins dependencies ...")));
                                                             __this.installDependencies(self);

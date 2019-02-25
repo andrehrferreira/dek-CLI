@@ -232,7 +232,7 @@ export class Init{
         });
 
         //Create .env
-        var dotEnvFile = `PORT=${self.settings.port}\n`;
+        var dotEnvFile = `DEBUG=true\nPORT=${self.settings.port}\n`;
 
         if(self.settings.frontend != "none" && self.settings.frontendproxy){
             switch (self.settings.frontend) {

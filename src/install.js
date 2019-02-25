@@ -46,7 +46,7 @@ export class Install{
 
                 if(self.settings.plugins.length > 0){
                     await plugins.installPlugins(self.settings.plugins, path.join(self.settings.path, "src", "plugins"));
-                    plugins.loadPackageDependencies(path.join(self.settings.path, "src", "plugins")).then((dependencies) => {
+                    plugins.loadPackageDependencies(path.join(self.settings.path, "src", "plugins"), self.settings.plugins).then((dependencies) => {
                         __this.addPackageDependencies(dependencies , self.settings, () => {
                             console.log(chalk.green(i18n.__("Install plugins dependencies ...")));
                             __this.installDependencies(self);
