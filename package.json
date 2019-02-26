@@ -1,6 +1,6 @@
 {
     "name": "@dekproject/cli",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "CLI for Dek",
     "main": "index.js",
     "scripts": {
@@ -58,8 +58,13 @@
         "mocha": "^5.2.0",
         "nodemon": "^1.18.9"
     },
+    "@dek/skeletons": {
+        "boostrap": "dekproject/boostrap",
+        "bootstrap-api": "dekproject/bootstrap-api"
+    },
     "@dek/plugins": {
         "mongodb": "dekproject/mongodb",
+        "mongoose": "dekproject/mongoose",
         "redis": "dekproject/redis"
     },
     "@dek/scripts": {

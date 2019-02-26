@@ -78,6 +78,9 @@ export class Init{
             var frontendChoices = Object.keys(PackageJSON["@dek/frontend"]);
             frontendChoices.unshift("none");
 
+            var skeletonsChoices = Object.keys(PackageJSON["@dek/skeletons"]);
+            skeletonsChoices.unshift("none");
+
             prompt([{
                 type: 'input',
                 name: 'path',
@@ -102,18 +105,15 @@ export class Init{
                     }
                 }
             }, {
-                type: 'confirm',
+                type: 'list',
                 name: 'skeleton',
                 message: i18n.__("Do you want to use default skeleton?"),
+                choices: skeletonsChoices
             }, {
                 type: 'confirm',
                 name: 'devmode',
                 message: i18n.__("Do you want to install components for development mode?"),
-            }/*, {
-                type: 'confirm',
-                name: 'webpack',
-                message: i18n.__("Do you want to install Webpack to optimize your frontend?"),
-            }*/, {
+            }, {
                 type: 'list',
                 name: 'frontend',
                 message: i18n.__("Do you want to install some frontend framework?"),
@@ -195,8 +195,8 @@ export class Init{
     cloneSkeleton(self){
         console.log(chalk.green(i18n.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
-        if(self.settings.skeleton){
-            var child = spawn(`git clone https://github.com/dekproject/boostrap ${self.settings.path}`, {
+        if(self.settings.skeleton != "none"){
+            var child = spawn(`git clone https://github.com/dekproject/${self.settings.skeleton} ${self.settings.path}`, {
                 shell: true,
                 env: process.env,
                 cwd: self.settings.path
@@ -205,13 +205,6 @@ export class Init{
             child.on('exit', function (exitCode) {
                 self.unlinkGitAndPackage(self);
             });
-
-            /*gitClone("git@github.com:dekproject/boostrap.git", self.settings.path, err => {
-                if(err) console.log(chalk.red(err));
-                else {
-                    self.unlinkGitAndPackage(self);
-                }
-            });*/
         }
         else{
             self.createGitAndPackage(self);
