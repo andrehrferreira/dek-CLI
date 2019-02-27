@@ -122,6 +122,9 @@ var Init = exports.Init = function () {
                 var frontendChoices = Object.keys(PackageJSON["@dek/frontend"]);
                 frontendChoices.unshift("none");
 
+                var skeletonsChoices = Object.keys(PackageJSON["@dek/skeletons"]);
+                skeletonsChoices.unshift("none");
+
                 prompt([{
                     type: 'input',
                     name: 'path',
@@ -142,17 +145,15 @@ var Init = exports.Init = function () {
                         }
                     }
                 }, {
-                    type: 'confirm',
+                    type: 'list',
                     name: 'skeleton',
-                    message: _i18n2.default.__("Do you want to use default skeleton?")
+                    message: _i18n2.default.__("Do you want to use default skeleton?"),
+                    choices: skeletonsChoices
                 }, {
                     type: 'confirm',
                     name: 'devmode',
-                    message: _i18n2.default.__("Do you want to install components for development mode?") /*, {
-                                                                                                             type: 'confirm',
-                                                                                                             name: 'webpack',
-                                                                                                             message: i18n.__("Do you want to install Webpack to optimize your frontend?"),
-                                                                                                          }*/ }, {
+                    message: _i18n2.default.__("Do you want to install components for development mode?")
+                }, {
                     type: 'list',
                     name: 'frontend',
                     message: _i18n2.default.__("Do you want to install some frontend framework?"),
@@ -228,8 +229,8 @@ var Init = exports.Init = function () {
         value: function cloneSkeleton(self) {
             console.log(_chalk2.default.green(_i18n2.default.__("Clone boorstrap ") + PackageJSON.repository.url.replace("CLI", "boostrap")));
 
-            if (self.settings.skeleton) {
-                var child = (0, _child_process.spawn)("git clone https://github.com/dekproject/boostrap " + self.settings.path, {
+            if (self.settings.skeleton != "none") {
+                var child = (0, _child_process.spawn)("git clone https://github.com/dekproject/" + self.settings.skeleton + " " + self.settings.path, {
                     shell: true,
                     env: process.env,
                     cwd: self.settings.path
@@ -238,13 +239,6 @@ var Init = exports.Init = function () {
                 child.on('exit', function (exitCode) {
                     self.unlinkGitAndPackage(self);
                 });
-
-                /*gitClone("git@github.com:dekproject/boostrap.git", self.settings.path, err => {
-                    if(err) console.log(chalk.red(err));
-                    else {
-                        self.unlinkGitAndPackage(self);
-                    }
-                });*/
             } else {
                 self.createGitAndPackage(self);
             }
