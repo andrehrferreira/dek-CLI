@@ -49,6 +49,10 @@ var _rimraf = require("rimraf");
 
 var _rimraf2 = _interopRequireDefault(_rimraf);
 
+var _series = require("async/series");
+
+var _series2 = _interopRequireDefault(_series);
+
 var _child_process = require("child_process");
 
 var _plugins = require("./plugins");
@@ -367,11 +371,11 @@ var Install = exports.Install = function () {
 }();
 
 exports.default = function () {
-    var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(argv) {
-        var install;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+    var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(argv) {
+        var install, pluginsList;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
             while (1) {
-                switch (_context6.prev = _context6.next) {
+                switch (_context5.prev = _context5.next) {
                     case 0:
                         install = new Install();
 
@@ -379,42 +383,34 @@ exports.default = function () {
                         if (argv.h) {
                             install.Help();
                         } else if (argv._.length > 1) {
-                            argv._.forEach(function () {
-                                var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(pluginName, index) {
-                                    return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                                        while (1) {
-                                            switch (_context5.prev = _context5.next) {
-                                                case 0:
-                                                    if (!(index != 0)) {
-                                                        _context5.next = 3;
-                                                        break;
-                                                    }
+                            pluginsList = [];
 
-                                                    _context5.next = 3;
-                                                    return (0, _plugins.installPlugin)(pluginName);
 
-                                                case 3:
-                                                case "end":
-                                                    return _context5.stop();
-                                            }
-                                        }
-                                    }, _callee5, undefined);
-                                }));
+                            _lodash2.default.map(argv._, function (pluginName, index) {
+                                pluginsList.push(function (callback) {
+                                    if (index != 0) {
+                                        _plugins.plugins.installPlugin(pluginName, null, false).then(function () {
+                                            callback();
+                                        });
+                                    } else {
+                                        callback();
+                                    }
+                                });
+                            });
 
-                                return function (_x8, _x9) {
-                                    return _ref6.apply(this, arguments);
-                                };
-                            }());
+                            (0, _series2.default)(pluginsList, function (err, result) {
+                                process.exit(0);
+                            });
                         } else {
                             install.Help();
                         }
 
                     case 2:
                     case "end":
-                        return _context6.stop();
+                        return _context5.stop();
                 }
             }
-        }, _callee6, undefined);
+        }, _callee5, undefined);
     }));
 
     return function (_x7) {

@@ -73,7 +73,7 @@ var Plugins = function () {
                             case 0:
                                 _context.next = 2;
                                 return plugins.forEach(function (pluginName) {
-                                    _this.installPlugin(pluginName, pathName);
+                                    _this.installPlugin(pluginName, pathName, true);
                                 });
 
                             case 2:
@@ -93,14 +93,17 @@ var Plugins = function () {
     }, {
         key: "installPlugin",
         value: function () {
-            var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(pluginName, pathName) {
+            var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(pluginName, pathName, isInit) {
                 var _this2 = this;
 
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                var __this;
+
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
-                                return _context3.abrupt("return", new Promise(function (resolve, reject) {
+                                __this = this;
+                                return _context4.abrupt("return", new Promise(function (resolve, reject) {
                                     if (pathName) var pluginPathResolve = _path2.default.resolve(pathName);else var pluginPathResolve = _path2.default.resolve(_path2.default.join(process.cwd(), "src", "plugins"));
 
                                     _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
@@ -136,9 +139,11 @@ var Plugins = function () {
                                         }, _callee2, _this2, [[0, 6]]);
                                     }))();
 
-                                    console.log(_chalk2.default.green("[" + pluginName + "] Installing ..."));
+                                    if (/(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/.test(pluginName)) var urlRepository = pluginName;else var urlRepository = "git clone https://github.com/dekproject/" + pluginName;
 
-                                    var child = (0, _child_process.spawn)("git clone https://github.com/dekproject/" + pluginName, {
+                                    console.log(_chalk2.default.green("[Installing] " + urlRepository));
+
+                                    var child = (0, _child_process.spawn)(urlRepository, {
                                         shell: true,
                                         env: process.env,
                                         cwd: pluginPathResolve
@@ -148,20 +153,71 @@ var Plugins = function () {
                                         reject("[" + pluginName + "] " + err);
                                     });
 
-                                    child.on('exit', function (exitCode) {
-                                        resolve();
-                                    });
+                                    child.on('exit', function () {
+                                        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(exitCode) {
+                                            var dependencies, childDependencies;
+                                            return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                                                while (1) {
+                                                    switch (_context3.prev = _context3.next) {
+                                                        case 0:
+                                                            if (isInit) {
+                                                                _context3.next = 10;
+                                                                break;
+                                                            }
+
+                                                            _context3.next = 3;
+                                                            return __this.loadPackageDependencies(pluginPathResolve);
+
+                                                        case 3:
+                                                            dependencies = _context3.sent;
+
+                                                            console.log(_chalk2.default.green("[" + pluginName + "] Load dependencies..."));
+
+                                                            childDependencies = (0, _child_process.spawn)("npm i " + dependencies, {
+                                                                shell: true,
+                                                                env: process.env,
+                                                                cwd: _path2.default.resolve(_path2.default.join(process.cwd())),
+                                                                stdio: [process.stdin, process.stdout, process.stderr]
+                                                            });
+
+
+                                                            childDependencies.on('error', function (err) {
+                                                                reject("[" + pluginName + "] " + err);
+                                                            });
+
+                                                            childDependencies.on('exit', function (exitCode) {
+                                                                console.log(_chalk2.default.green("[" + pluginName + "] Installation completed!"));
+                                                                resolve();
+                                                            });
+                                                            _context3.next = 11;
+                                                            break;
+
+                                                        case 10:
+                                                            resolve();
+
+                                                        case 11:
+                                                        case "end":
+                                                            return _context3.stop();
+                                                    }
+                                                }
+                                            }, _callee3, _this2);
+                                        }));
+
+                                        return function (_x6) {
+                                            return _ref4.apply(this, arguments);
+                                        };
+                                    }());
                                 }));
 
-                            case 1:
+                            case 2:
                             case "end":
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee4, this);
             }));
 
-            function installPlugin(_x3, _x4) {
+            function installPlugin(_x3, _x4, _x5) {
                 return _ref2.apply(this, arguments);
             }
 
@@ -175,47 +231,49 @@ var Plugins = function () {
             return new Promise(function (resolve, reject) {
                 if (pathName) var pluginPathResolve = _path2.default.resolve(pathName);else var pluginPathResolve = _path2.default.resolve(_path2.default.join(process.cwd(), "src", "plugins"));
 
+                if (!pluginList) pluginList = [];
+
                 var pInterval = setInterval(function () {
                     (0, _globby2.default)([pluginPathResolve + "/*/package.json"]).then(function () {
-                        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(paths) {
+                        var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(paths) {
                             var dependenciesArr;
-                            return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                            return regeneratorRuntime.wrap(function _callee6$(_context6) {
                                 while (1) {
-                                    switch (_context5.prev = _context5.next) {
+                                    switch (_context6.prev = _context6.next) {
                                         case 0:
-                                            if (!(paths.length == pluginList.length)) {
-                                                _context5.next = 6;
+                                            if (!(paths.length == pluginList.length || pluginList.length == 0)) {
+                                                _context6.next = 6;
                                                 break;
                                             }
 
                                             clearInterval(pInterval);
                                             dependenciesArr = [];
-                                            _context5.next = 5;
+                                            _context6.next = 5;
                                             return paths.forEach(function () {
-                                                var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(pluginPackagePath) {
+                                                var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(pluginPackagePath) {
                                                     var pluginPackageRequest;
-                                                    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                                                    return regeneratorRuntime.wrap(function _callee5$(_context5) {
                                                         while (1) {
-                                                            switch (_context4.prev = _context4.next) {
+                                                            switch (_context5.prev = _context5.next) {
                                                                 case 0:
-                                                                    _context4.next = 2;
+                                                                    _context5.next = 2;
                                                                     return require(pluginPackagePath);
 
                                                                 case 2:
-                                                                    pluginPackageRequest = _context4.sent;
+                                                                    pluginPackageRequest = _context5.sent;
 
                                                                     dependenciesArr = _lodash2.default.concat(dependenciesArr, Object.keys(pluginPackageRequest.dependencies));
 
                                                                 case 4:
                                                                 case "end":
-                                                                    return _context4.stop();
+                                                                    return _context5.stop();
                                                             }
                                                         }
-                                                    }, _callee4, _this3);
+                                                    }, _callee5, _this3);
                                                 }));
 
-                                                return function (_x6) {
-                                                    return _ref5.apply(this, arguments);
+                                                return function (_x8) {
+                                                    return _ref6.apply(this, arguments);
                                                 };
                                             }());
 
@@ -227,14 +285,14 @@ var Plugins = function () {
 
                                         case 6:
                                         case "end":
-                                            return _context5.stop();
+                                            return _context6.stop();
                                     }
                                 }
-                            }, _callee5, _this3);
+                            }, _callee6, _this3);
                         }));
 
-                        return function (_x5) {
-                            return _ref4.apply(this, arguments);
+                        return function (_x7) {
+                            return _ref5.apply(this, arguments);
                         };
                     }());
                 }, 1000);
@@ -247,37 +305,37 @@ var Plugins = function () {
 
             var pluginPathResolve = _path2.default.resolve(_path2.default.join(process.cwd(), "src", "plugins"));
 
-            _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+            _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
-                                _context6.prev = 0;
+                                _context7.prev = 0;
 
                                 if (_fs2.default.statSync(pluginPathResolve).isDirectory()) {
-                                    _context6.next = 4;
+                                    _context7.next = 4;
                                     break;
                                 }
 
-                                _context6.next = 4;
+                                _context7.next = 4;
                                 return _fs2.default.mkdirSync(pluginPathResolve, { recursive: true });
 
                             case 4:
-                                _context6.next = 9;
+                                _context7.next = 9;
                                 break;
 
                             case 6:
-                                _context6.prev = 6;
-                                _context6.t0 = _context6["catch"](0);
+                                _context7.prev = 6;
+                                _context7.t0 = _context7["catch"](0);
 
                                 _fs2.default.mkdirSync(pluginPathResolve, { recursive: true });
 
                             case 9:
                             case "end":
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, _this4, [[0, 6]]);
+                }, _callee7, _this4, [[0, 6]]);
             }))();
 
             prompt([{
@@ -289,11 +347,11 @@ var Plugins = function () {
                     if (value.length) return true;else return _i18n2.default.__("Please set a valid value");
                 }
             }]).then(function () {
-                var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(newPluginSettings) {
+                var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(newPluginSettings) {
                     var child;
-                    return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    return regeneratorRuntime.wrap(function _callee8$(_context8) {
                         while (1) {
-                            switch (_context7.prev = _context7.next) {
+                            switch (_context8.prev = _context8.next) {
                                 case 0:
                                     child = (0, _child_process.spawn)("git clone https://github.com/dekproject/plugin-bootstrap " + newPluginSettings.name, {
                                         shell: true,
@@ -311,14 +369,14 @@ var Plugins = function () {
 
                                 case 3:
                                 case "end":
-                                    return _context7.stop();
+                                    return _context8.stop();
                             }
                         }
-                    }, _callee7, _this4);
+                    }, _callee8, _this4);
                 }));
 
-                return function (_x7) {
-                    return _ref7.apply(this, arguments);
+                return function (_x9) {
+                    return _ref8.apply(this, arguments);
                 };
             }());
         }
@@ -332,11 +390,11 @@ var installPlugins = exports.installPlugins = new Plugins().installPlugins;
 var installPlugin = exports.installPlugin = new Plugins().installPlugin;
 
 exports.default = function () {
-    var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(argv) {
+    var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(argv) {
         var plugins;
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
             while (1) {
-                switch (_context8.prev = _context8.next) {
+                switch (_context9.prev = _context9.next) {
                     case 0:
                         plugins = new Plugins();
 
@@ -347,14 +405,14 @@ exports.default = function () {
 
                     case 2:
                     case "end":
-                        return _context8.stop();
+                        return _context9.stop();
                 }
             }
-        }, _callee8, undefined);
+        }, _callee9, undefined);
     }));
 
-    return function (_x8) {
-        return _ref8.apply(this, arguments);
+    return function (_x10) {
+        return _ref9.apply(this, arguments);
     };
 }();
 //# sourceMappingURL=plugins.js.map

@@ -10,9 +10,10 @@ import i18n from "i18n";
 import _ from "lodash";
 import gitClone from "git-clone";
 import rimraf from "rimraf";
+import series from 'async/series';
 import { exec, spawn } from "child_process";
 
-import { plugins, installPlugin } from "./plugins";
+import { plugins } from "./plugins";
 
 const CLIPath = path.resolve(path.dirname(fs.realpathSync(__filename)), "../");
 const PackageJSON = require(path.join(CLIPath, "package"));
@@ -217,9 +218,23 @@ export default async (argv) => {
         install.Help();
     }
     else if(argv._.length > 1){
-        argv._.forEach(async (pluginName, index) => {
-            if(index != 0)
-                await installPlugin(pluginName);
+        var pluginsList = [];
+
+        _.map(argv._, (pluginName, index) => {
+            pluginsList.push((callback) => {
+                if(index != 0){
+                    plugins.installPlugin(pluginName, null, false).then(() => {
+                        callback();
+                    });
+                }
+                else{
+                    callback();
+                }
+            });
+        });
+
+        series(pluginsList, (err, result) => {
+            process.exit(0);
         });
     }
     else{
