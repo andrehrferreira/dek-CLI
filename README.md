@@ -35,8 +35,6 @@ The CLI will ask you some questions for configuring the **package.json** and **.
 ? Directory for your project: /media/Dek/CLI/myproject
 ? What is the repository of this project? https://github.com/dekproject/CLI
 ? Do you want to use default skeleton? [Yes/No]
-? Do you want to install components for development mode? [Yes/No]
-? Do you want to install some frontend framework? [nuxt/angular/react]
 ```
 
 ### Skeleton
