@@ -1,6 +1,6 @@
 {
     "name": "@dekproject/cli",
-    "version": "1.3.1",
+    "version": "1.3.2",
     "description": "CLI for Dek",
     "main": "index.js",
     "scripts": {
