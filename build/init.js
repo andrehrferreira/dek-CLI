@@ -8,6 +8,8 @@ exports.Init = undefined;
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 //import YAML from 'yaml';
 
+require("@babel/polyfill/noConflict");
+
 var _fs = require("fs");
 
 var _fs2 = _interopRequireDefault(_fs);
@@ -19,8 +21,6 @@ var _path2 = _interopRequireDefault(_path);
 var _npm = require("npm");
 
 var _npm2 = _interopRequireDefault(_npm);
-
-require("babel-polyfill");
 
 var _minimist = require("minimist");
 
@@ -148,17 +148,16 @@ var Init = exports.Init = function () {
                     type: 'list',
                     name: 'skeleton',
                     message: _i18n2.default.__("Do you want to use default skeleton?"),
-                    choices: skeletonsChoices
-                }, {
-                    type: 'confirm',
-                    name: 'devmode',
-                    message: _i18n2.default.__("Do you want to install components for development mode?")
-                }, {
-                    type: 'list',
-                    name: 'frontend',
-                    message: _i18n2.default.__("Do you want to install some frontend framework?"),
-                    choices: frontendChoices
-                }]).then(function (projectConfirms) {
+                    choices: skeletonsChoices /*, {
+                                                 type: 'confirm',
+                                                 name: 'devmode',
+                                                 message: i18n.__("Do you want to install components for development mode?"),
+                                              }, {
+                                                 type: 'list',
+                                                 name: 'frontend',
+                                                 message: i18n.__("Do you want to install some frontend framework?"),
+                                                 choices: frontendChoices
+                                              }*/ }]).then(function (projectConfirms) {
                     if (projectConfirms.skeleton) {
                         prompt([{
                             type: 'input',
@@ -180,26 +179,27 @@ var Init = exports.Init = function () {
                             message: _i18n2.default.__("Select plugins for your project:"),
                             choices: Object.keys(PackageJSON["@dek/plugins"])
                         }]).then(function (projectSettingsPlugins) {
-                            if (projectConfirms.frontend != "none") {
+                            /*if(projectConfirms.frontend != "none"){
                                 prompt([{
                                     type: 'confirm',
                                     name: 'frontendproxy',
-                                    message: _i18n2.default.__("Do you want to create a frontend proxy?")
+                                    message: i18n.__("Do you want to create a frontend proxy?"),
                                 }, {
                                     type: 'input',
                                     name: 'backendroute',
                                     default: "/api",
-                                    message: _i18n2.default.__("What will be the backend path?")
-                                }]).then(function (projectFrontendSettings) {
-                                    var settings = _lodash2.default.merge(projectSettings, projectConfirms, projectSettingsPlugins, projectFrontendSettings);
+                                    message: i18n.__("What will be the backend path?"),
+                                }]).then(projectFrontendSettings => {
+                                    let settings = _.merge(projectSettings, projectConfirms, projectSettingsPlugins, projectFrontendSettings);
                                     self.settings = settings;
                                     self.createProject();
                                 });
-                            } else {
-                                var _settings = _lodash2.default.merge(projectSettings, projectConfirms, projectSettingsPlugins);
-                                self.settings = _settings;
-                                self.createProject();
                             }
+                            else{*/
+                            var settings = _lodash2.default.merge(projectSettings, projectConfirms, projectSettingsPlugins);
+                            self.settings = settings;
+                            self.createProject();
+                            //}
                         });
                     } else {
                         settings = _lodash2.default.merge(projectSettings, projectConfirms);
@@ -259,26 +259,24 @@ var Init = exports.Init = function () {
             });
 
             //Create .env
-            var dotEnvFile = "DEBUG=true\nPORT=" + self.settings.port + "\n";
+            var dotEnvFile = "DEBUG=true\nPORT=" + self.settings.port + "\nCLUSTER_MAX=1\n";
 
-            if (self.settings.frontend != "none" && self.settings.frontendproxy) {
+            /*if(self.settings.frontend != "none" && self.settings.frontendproxy){
                 switch (self.settings.frontend) {
                     case "nuxt":
                     case "react":
                         dotEnvFile += "PROXY_URL=http://localhost:3000\n";
-                        break;
-                    case "angular":
-                        dotEnvFile += "PROXY_URL=http://localhost:4200\n";break;
+                    break;
+                    case "angular": dotEnvFile += "PROXY_URL=http://localhost:4200\n"; break;
                     default:
-                        console.log(_chalk2.default.red(_i18n2.default.__("Error trying to create proxy")));
-                        break;
+                        console.log(chalk.red(i18n.__("Error trying to create proxy")));
+                    break;
                 }
-
-                if (self.settings.backendroute) dotEnvFile += "BACKEND_ALIAS=" + self.settings.backendroute + "\n";
-
-                //Create proxy.js
-                _fs2.default.writeFileSync(_path2.default.join(self.settings.path, "src", "proxy.js"), require(_path2.default.join(CLIPath, "templates", "proxy.js"))());
-            }
+                 if(self.settings.backendroute)
+                    dotEnvFile += `BACKEND_ALIAS=${self.settings.backendroute}\n`;
+                 //Create proxy.js
+                fs.writeFileSync(path.join(self.settings.path, "src", "proxy.js"), require(path.join(CLIPath, "templates", "proxy.js"))());
+            }*/
 
             _fs2.default.writeFileSync(_path2.default.join(self.settings.path, ".env"), dotEnvFile);
         }
@@ -287,7 +285,10 @@ var Init = exports.Init = function () {
         value: function createGitAndPackage(self) {
             console.log(_chalk2.default.green(_i18n2.default.__("Creating project package.json ...")));
 
-            if (self.settings.frontend && self.settings.frontend != "none") var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package-with-frontend.json.js"));else var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package.json.js"));
+            /*if(self.settings.frontend && self.settings.frontend != "none")
+                var packageJSONTemplate = require(path.join(CLIPath, "templates", "package-with-frontend.json.js"));
+            else*/
+            var packageJSONTemplate = require(_path2.default.join(CLIPath, "templates", "package.json.js"));
 
             packageJSONTemplate = packageJSONTemplate(self);
 

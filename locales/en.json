@@ -48,5 +48,6 @@
 	"Do you want to use default skeleton?": "Do you want to use default skeleton?",
 	"Install plugins dependencies ...": "Install plugins dependencies ...",
 	"myplugin": "myplugin",
-	"What is the name of the plugin?": "What is the name of the plugin?"
+	"What is the name of the plugin?": "What is the name of the plugin?",
+	"Unlink boostrap /home/aw/Projetos/dekproject/CLI/myproject/.git": "Unlink boostrap /home/aw/Projetos/dekproject/CLI/myproject/.git"
 }

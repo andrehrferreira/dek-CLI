@@ -1,7 +1,7 @@
+import '@babel/polyfill/noConflict';
+
 import fs from "fs";
 import path from "path";
-
-import 'babel-polyfill';
 import chalk from "chalk";
 import globby from "globby";
 import _ from "lodash";

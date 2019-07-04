@@ -1,8 +1,8 @@
+import '@babel/polyfill/noConflict';
+
 import fs from "fs";
 import path from "path";
 import npm from "npm";
-
-import 'babel-polyfill';
 import minimist from "minimist";
 import chalk from "chalk";
 import inquirer from "inquirer";
@@ -26,7 +26,7 @@ export class Install{
         var __this = this;
         this.packageJSONTemplate = packageJSONTemplate;
 
-        if(self.settings.devmode)
+        /*if(self.settings.devmode)
             await this.installDevMode(self);
         else
             this.installedDevMode = true;
@@ -38,10 +38,10 @@ export class Install{
         else {
             await this.installWebpack(self);
             this.installedFrontend = true;
-        }
+        }*/
 
         var installInterval = setInterval(async () => {
-            if(this.installedDevMode && this.installedWebpack && this.installedFrontend){
+            //if(this.installedDevMode && this.installedWebpack && this.installedFrontend){
                 clearInterval(installInterval);
                 console.log(chalk.green(i18n.__("Create package.json ...")));
 
@@ -57,7 +57,7 @@ export class Install{
                 else{
                     this.installDependencies(self);
                 }
-            }
+            //}
         }, 1000);
     }
 
@@ -82,7 +82,7 @@ export class Install{
 To start the project in development mode:
 $ cd .${self.settings.path.replace(process.cwd(), "")}
 $ ${PackageJSON["@dek/scripts"].cliDevMode}
-$ npm run dev
+$ yarn dev
 `;
 
                         console.log(usageText);
@@ -95,8 +95,7 @@ $ npm run dev
 To start the project in development mode:
 $ cd .${self.settings.path.replace(process.cwd(), "")}
 $ ${PackageJSON["@dek/scripts"].cliDevMode}
-$ npm install --save-dev
-$ npm run dev
+$ yarn dev
 `;
 
                     console.log(usageText);

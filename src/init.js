@@ -1,8 +1,8 @@
+import '@babel/polyfill/noConflict';
+
 import fs from "fs";
 import path from "path";
 import npm from "npm";
-
-import 'babel-polyfill';
 import minimist from "minimist";
 import chalk from "chalk";
 import inquirer from "inquirer";
@@ -109,7 +109,7 @@ export class Init{
                 name: 'skeleton',
                 message: i18n.__("Do you want to use default skeleton?"),
                 choices: skeletonsChoices
-            }, {
+            }/*, {
                 type: 'confirm',
                 name: 'devmode',
                 message: i18n.__("Do you want to install components for development mode?"),
@@ -118,7 +118,7 @@ export class Init{
                 name: 'frontend',
                 message: i18n.__("Do you want to install some frontend framework?"),
                 choices: frontendChoices
-            }]).then(projectConfirms => {
+            }*/]).then(projectConfirms => {
                 if(projectConfirms.skeleton){
                     prompt([{
                         type: 'input',
@@ -144,7 +144,7 @@ export class Init{
                         message: i18n.__("Select plugins for your project:"),
                         choices: Object.keys(PackageJSON["@dek/plugins"])
                     }]).then(projectSettingsPlugins => {
-                        if(projectConfirms.frontend != "none"){
+                        /*if(projectConfirms.frontend != "none"){
                             prompt([{
                                 type: 'confirm',
                                 name: 'frontendproxy',
@@ -160,11 +160,11 @@ export class Init{
                                 self.createProject();
                             });
                         }
-                        else{
+                        else{*/
                             let settings = _.merge(projectSettings, projectConfirms, projectSettingsPlugins);
                             self.settings = settings;
                             self.createProject();
-                        }
+                        //}
                     });
                 }
                 else{
@@ -225,9 +225,9 @@ export class Init{
         });
 
         //Create .env
-        var dotEnvFile = `DEBUG=true\nPORT=${self.settings.port}\n`;
+        var dotEnvFile = `DEBUG=true\nPORT=${self.settings.port}\nCLUSTER_MAX=1\n`;
 
-        if(self.settings.frontend != "none" && self.settings.frontendproxy){
+        /*if(self.settings.frontend != "none" && self.settings.frontendproxy){
             switch (self.settings.frontend) {
                 case "nuxt":
                 case "react":
@@ -244,7 +244,7 @@ export class Init{
 
             //Create proxy.js
             fs.writeFileSync(path.join(self.settings.path, "src", "proxy.js"), require(path.join(CLIPath, "templates", "proxy.js"))());
-        }
+        }*/
 
         fs.writeFileSync(path.join(self.settings.path, ".env"), dotEnvFile);
     }
@@ -252,9 +252,9 @@ export class Init{
     createGitAndPackage(self){
         console.log(chalk.green(i18n.__("Creating project package.json ...")));
 
-        if(self.settings.frontend && self.settings.frontend != "none")
+        /*if(self.settings.frontend && self.settings.frontend != "none")
             var packageJSONTemplate = require(path.join(CLIPath, "templates", "package-with-frontend.json.js"));
-        else
+        else*/
             var packageJSONTemplate = require(path.join(CLIPath, "templates", "package.json.js"));
 
         packageJSONTemplate = packageJSONTemplate(self);

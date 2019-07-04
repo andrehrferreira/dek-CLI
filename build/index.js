@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 "use strict";
 
+require("@babel/polyfill/noConflict");
+
 var _fs = require("fs");
 
 var _fs2 = _interopRequireDefault(_fs);
@@ -8,8 +10,6 @@ var _fs2 = _interopRequireDefault(_fs);
 var _path = require("path");
 
 var _path2 = _interopRequireDefault(_path);
-
-require("babel-polyfill");
 
 var _minimist = require("minimist");
 

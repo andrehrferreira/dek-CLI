@@ -1,4 +1,4 @@
-import 'babel-polyfill';
+import '@babel/polyfill/noConflict';
 
 export default async () => {
     const usageText = `     Usage:

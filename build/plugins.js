@@ -7,6 +7,8 @@ exports.installPlugin = exports.installPlugins = exports.plugins = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+require("@babel/polyfill/noConflict");
+
 var _fs = require("fs");
 
 var _fs2 = _interopRequireDefault(_fs);
@@ -14,8 +16,6 @@ var _fs2 = _interopRequireDefault(_fs);
 var _path = require("path");
 
 var _path2 = _interopRequireDefault(_path);
-
-require("babel-polyfill");
 
 var _chalk = require("chalk");
 

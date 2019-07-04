@@ -7,6 +7,8 @@ exports.Install = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+require("@babel/polyfill/noConflict");
+
 var _fs = require("fs");
 
 var _fs2 = _interopRequireDefault(_fs);
@@ -18,8 +20,6 @@ var _path2 = _interopRequireDefault(_path);
 var _npm = require("npm");
 
 var _npm2 = _interopRequireDefault(_npm);
-
-require("babel-polyfill");
 
 var _minimist = require("minimist");
 
@@ -90,78 +90,50 @@ var Install = exports.Install = function () {
 
                                 this.packageJSONTemplate = packageJSONTemplate;
 
-                                if (!self.settings.devmode) {
-                                    _context2.next = 7;
-                                    break;
+                                /*if(self.settings.devmode)
+                                    await this.installDevMode(self);
+                                else
+                                    this.installedDevMode = true;
+                                 if(self.settings.frontend != "none"){
+                                    await this.installFrontendFramework(self);
+                                    this.installedWebpack = true;
                                 }
+                                else {
+                                    await this.installWebpack(self);
+                                    this.installedFrontend = true;
+                                }*/
 
-                                _context2.next = 5;
-                                return this.installDevMode(self);
-
-                            case 5:
-                                _context2.next = 8;
-                                break;
-
-                            case 7:
-                                this.installedDevMode = true;
-
-                            case 8:
-                                if (!(self.settings.frontend != "none")) {
-                                    _context2.next = 14;
-                                    break;
-                                }
-
-                                _context2.next = 11;
-                                return this.installFrontendFramework(self);
-
-                            case 11:
-                                this.installedWebpack = true;
-                                _context2.next = 17;
-                                break;
-
-                            case 14:
-                                _context2.next = 16;
-                                return this.installWebpack(self);
-
-                            case 16:
-                                this.installedFrontend = true;
-
-                            case 17:
                                 installInterval = setInterval(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
                                     return regeneratorRuntime.wrap(function _callee$(_context) {
                                         while (1) {
                                             switch (_context.prev = _context.next) {
                                                 case 0:
-                                                    if (!(_this.installedDevMode && _this.installedWebpack && _this.installedFrontend)) {
-                                                        _context.next = 10;
-                                                        break;
-                                                    }
-
+                                                    //if(this.installedDevMode && this.installedWebpack && this.installedFrontend){
                                                     clearInterval(installInterval);
                                                     console.log(_chalk2.default.green(_i18n2.default.__("Create package.json ...")));
 
                                                     if (!(self.settings.plugins.length > 0)) {
-                                                        _context.next = 9;
+                                                        _context.next = 8;
                                                         break;
                                                     }
 
-                                                    _context.next = 6;
+                                                    _context.next = 5;
                                                     return _plugins.plugins.installPlugins(self.settings.plugins, _path2.default.join(self.settings.path, "src", "plugins"));
 
-                                                case 6:
+                                                case 5:
                                                     _plugins.plugins.loadPackageDependencies(_path2.default.join(self.settings.path, "src", "plugins"), self.settings.plugins).then(function (dependencies) {
                                                         __this.addPackageDependencies(dependencies, self.settings, function () {
                                                             console.log(_chalk2.default.green(_i18n2.default.__("Install plugins dependencies ...")));
                                                             __this.installDependencies(self);
                                                         });
                                                     });
-                                                    _context.next = 10;
+                                                    _context.next = 9;
                                                     break;
 
-                                                case 9:
+                                                case 8:
                                                     _this.installDependencies(self);
 
-                                                case 10:
+                                                case 9:
                                                 case "end":
                                                     return _context.stop();
                                             }
@@ -169,7 +141,7 @@ var Install = exports.Install = function () {
                                     }, _callee, _this);
                                 })), 1000);
 
-                            case 18:
+                            case 3:
                             case "end":
                                 return _context2.stop();
                         }

@@ -1,7 +1,7 @@
+import '@babel/polyfill/noConflict';
+
 import fs from "fs";
 import path from "path";
-
-import 'babel-polyfill';
 import minimist from "minimist";
 import chalk from "chalk";
 import inquirer from "inquirer";
